@@ -1,0 +1,18 @@
+{
+    "anim_settings": {
+        "attributes_to_check": ["translateX", "translateY"],
+        "key_min": 1,
+        "key_max": 30
+        },
+    "char_settings": {
+        "valid_materials_list": ["lambert1", "lambert2"],
+        "key_min": 1,
+        "key_max": 30
+        },
+    "prop_settings": {
+        "valid_materials_list": ["lambert1", "lambert2"],
+        "key_min": 1,
+        "key_max": 30,
+        "collision_prefix": ["ucx_"]
+        }
+}
