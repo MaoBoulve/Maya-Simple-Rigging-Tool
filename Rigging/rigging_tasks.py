@@ -36,9 +36,15 @@ def create_control_shape_on_joint(joint):
 
 def create_rig_base(rig_type):
     print("Create rig base")
-    # todo: create rig base??
+    # todo LATER: create rig base??
 
 def set_mesh_weight_paint_to_joint(skinned_mesh, joint):
+    """
+    Sets skinned mesh to full rig influence to the single joint passed in
+
+    :param skinned_mesh: Maya skinned mesh
+    :param joint: Maya joint object
+    """
     print("Flood weight paint")
 
     shape_node = __get_shape_node(skinned_mesh)
@@ -51,11 +57,10 @@ def set_mesh_weight_paint_to_joint(skinned_mesh, joint):
     return
 
 
-def __get_shape_node( object_to_get):
+def __get_shape_node(object_to_get):
     """
     Gets shape node depending on shape method
     :param object_to_get:
-    :return:
     """
     if pm.objectType(object_to_get) == 'mesh':
         return object_to_get
@@ -68,6 +73,8 @@ def __get_shape_node( object_to_get):
 def __get_skin_cluster_nodes(shape_object):
     """
     Gets skin cluster nodes
+
+    :return: skin_cluster_node_list - list of skinCluster nodes with connection to rig
     """
     skin_cluster_node_list = shape_object.listConnections(type='skinCluster')
     return skin_cluster_node_list
@@ -75,6 +82,15 @@ def __get_skin_cluster_nodes(shape_object):
 
 
 def set_selected_vertex_weight_paint_influence_for_joint(selected_vertex, joint_influence, joint):
+    """
+    Sets the rig influence on the vertex(es) from the joint to a given value. Does a single skinPercent call for
+    performance.
+
+    :param selected_vertex: List of vertex maya objects
+    :param joint_influence: Float value between 0-1
+    :param joint: Joint object
+    :return:
+    """
     print("Set vertex influence")
 
     # A selected vertex will have name format [shapeNode].vtx[i]
