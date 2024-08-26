@@ -1,12 +1,18 @@
 import pymel.core as pm
 
+# Edge cases handled by Maya:
+#   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 def test():
     #create_control_shape_on_joint(pm.ls(sl=True)[0])
 
     # set_mesh_weight_paint_to_joint(pm.ls(sl=True)[0], pm.ls('test_flood')[0])
-    set_selected_vertex_weight_paint_influence_for_joint(pm.ls(sl=True), 0.5, pm.ls('test_flood')[0])
+    set_vertex_weight_paint_influence_from_joint(pm.ls(sl=True), 0.5, pm.ls('test_flood')[0])
 
+# TODO: display currently selected mesh setting weight paint on in UI
+# TODO: display skeleton joint used for weight paint
+# TODO: display vertexes used for weight paint
+# TODO: UNDO ACTION
 
 def create_control_shape_on_joint(joint):
     print("Create ctl")
@@ -38,7 +44,7 @@ def create_rig_base(rig_type):
     print("Create rig base")
     # todo LATER: create rig base??
 
-def set_mesh_weight_paint_to_joint(skinned_mesh, joint):
+def set_mesh_weight_paint_from_joint(skinned_mesh, joint):
     """
     Sets skinned mesh to full rig influence to the single joint passed in
 
@@ -81,7 +87,7 @@ def __get_skin_cluster_nodes(shape_object):
 
 
 
-def set_selected_vertex_weight_paint_influence_for_joint(selected_vertex, joint_influence, joint):
+def set_vertex_weight_paint_influence_from_joint(selected_vertex, joint_influence, joint):
     """
     Sets the rig influence on the vertex(es) from the joint to a given value. Does a single skinPercent call for
     performance.
