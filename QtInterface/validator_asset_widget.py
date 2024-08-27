@@ -15,7 +15,7 @@ of the dropdown window. Updates widget via re-queries into the state of the meta
 
 from PySide2 import QtWidgets
 
-import qt_widget_base as WidgetTemplate
+import qt_maya_widget_base as WidgetTemplate
 from qt_utils import QtMayaUtils, QtMetadataUtils
 
 
@@ -45,13 +45,13 @@ class AssetTaggingWidget(WidgetTemplate.QtMayaWidgetWindow):
         return
 
     def _collect_ui_elements(self):
-        self.btn_close = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_close')
-        self.btn_open_settings = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_open_settings')
-        self.asset_list = self.widget_ui.findChild(QtWidgets.QListWidget, 'asset_list')
+        self.btn_close = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_close')
+        self.btn_open_settings = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_open_settings')
+        self.asset_list = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'asset_list')
 
-        self.validation_group_dropdown = self.widget_ui.findChild(QtWidgets.QComboBox, 'validation_groups_dropdown')
-        self.btn_add_to_group = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_add_to_group')
-        self.btn_remove_from_group = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_remove_from_group')
+        self.validation_group_dropdown = self.QWidget_instance.findChild(QtWidgets.QComboBox, 'validation_groups_dropdown')
+        self.btn_add_to_group = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_add_to_group')
+        self.btn_remove_from_group = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_remove_from_group')
 
         return
 

@@ -13,7 +13,7 @@ Qt Validator Settings Widget. Nests Widget classes in the main settings widget w
 """
 from abc import abstractmethod
 
-import qt_widget_base as WidgetTemplate
+import qt_maya_widget_base as WidgetTemplate
 from PySide2 import QtWidgets
 
 from qt_utils import QtMayaUtils
@@ -56,19 +56,19 @@ class SettingsWidget(WidgetTemplate.QtMayaWidgetWindow):
 
     def _collect_ui_elements(self):
 
-        self.btn_close = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_close')
-        self.btn_open_tagging = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_open_tagging')
-        self.btn_run = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_run')
-        self.btn_run_all = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_run_all')
-        self.tab_validationTasks = self.widget_ui.findChild(QtWidgets.QTabWidget, 'tab_validationTasks')
+        self.btn_close = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_close')
+        self.btn_open_tagging = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_open_tagging')
+        self.btn_run = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_run')
+        self.btn_run_all = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_run_all')
+        self.tab_validationTasks = self.QWidget_instance.findChild(QtWidgets.QTabWidget, 'tab_validationTasks')
 
         return
 
     def _initialize_ui_element_states(self):
 
-        self.anim_tab = _AnimGroupWidgetTab(tab_widget_parent=self.widget_ui)
-        self.prop_tab = _PropGroupWidgetTab(tab_widget_parent=self.widget_ui)
-        self.char_tab = _CharacterGroupWidgetTab(tab_widget_parent=self.widget_ui)
+        self.anim_tab = _AnimGroupWidgetTab(tab_widget_parent=self.QWidget_instance)
+        self.prop_tab = _PropGroupWidgetTab(tab_widget_parent=self.QWidget_instance)
+        self.char_tab = _CharacterGroupWidgetTab(tab_widget_parent=self.QWidget_instance)
 
         return
 

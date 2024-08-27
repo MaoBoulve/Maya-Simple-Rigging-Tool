@@ -38,8 +38,11 @@ class QtMayaWidget(QtWidgets.QDialog):
         3. _initialize_ui_element_states
         4. _create_ui_connections_to_class_functions
 
-    super().__init__() must be called in deriving classes if __init__ is overriden
+    super().__init__() must be called in deriving classes if __init__ is overridden
     """
+
+    #TODO: declare QWidget instance as an abstract property
+    # https://stackoverflow.com/questions/2736255/abstract-attributes-in-python
 
     def __init__(self, parent=_get_maya_window()):
         """
@@ -48,21 +51,13 @@ class QtMayaWidget(QtWidgets.QDialog):
 
         super(QtMayaWidget, self).__init__(parent)
 
-        self._init_ui_file()
+        self._QWidget_instance = None # QtWidget_instance is QWidget container holding all buttons, text, etc.
         self._collect_ui_elements()
         self._initialize_ui_element_states()
         self._create_ui_connections_to_class_functions()
 
         return
 
-    @abstractmethod
-    def _init_ui_file(self):
-        """
-        Abstract method for loading ui file for widget
-        """
-        print("-- Deriving class needs to override '__init_ui_file ")
-
-        return
 
     @abstractmethod
     def _collect_ui_elements(self):
@@ -113,13 +108,10 @@ class QtMayaWidgetWindow(QtMayaWidget):
         :param window_object_name: window name for python indexing
         """
         self.filepath = filepath
-        self.widget_ui = None
-
-        self.window_title = None
-        self.window_object_name = None
 
         self.window_title = window_title
         self.window_object_name = window_object_name
+        self._init_ui_file()
 
         super().__init__()
 
@@ -143,14 +135,16 @@ class QtMayaWidgetWindow(QtMayaWidget):
 
         # Load the file and store in instance variable
         loader = QtUiTools.QUiLoader()
-        self.widget_ui = loader.load(qt_ui_file)
+        self.QWidget_instance = loader.load(qt_ui_file)
+
+        self.set_QWidget_instance(loader.load(qt_ui_file))
 
         # Set the object name
         self.setObjectName(self.window_object_name)
         # Set the title on the Parent Widget
         self.setWindowTitle(self.window_title)
         # Set the UI file parent to the QDialog ExampleWindow root
-        self.widget_ui.setParent(self)
+        self.QWidget_instance.setParent(self)
 
         qt_ui_file.close()
 
@@ -180,7 +174,8 @@ class QtMayaWidgetWindow(QtMayaWidget):
         if QtWidgets.QApplication.instance():
             # ID any current instances of tool and destroy
             for win in (QtWidgets.QApplication.allWindows()):
-                if self.window_object_name in win.objectName():  # update this name to match name below
+
+                if self.window_object_name in win.objectName():  # if object name matches, destroy the matching window
                     win.destroy()
 
         else:
@@ -194,4 +189,25 @@ class QtMayaWidgetWindow(QtMayaWidget):
         """
         self.destroy()
 
+        return
+
+
+class QtMayaNestedWidget(QtMayaWidget):
+    """
+    Qt Maya widget class for widgets already loaded in the initial .ui instantiation (tool box, tab widget, stacked widget)
+
+    Instances are created with reference to QWidget
+
+    Deriving classes should override:
+    -collect_ui_elements.
+    -set_ui_element_states.
+    -create_ui_connections_to_class_functions.
+    """
+
+    def __init__(self, tab_widget_parent):
+        """
+        Init call
+        """
+        self.widget_parent = tab_widget_parent
+        super().__init__()
         return

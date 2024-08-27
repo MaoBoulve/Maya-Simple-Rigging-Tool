@@ -11,7 +11,7 @@
 Output log widget for displaying results of validation tasks. Allows user to select related maya object tied to each
 output entry. Has functionality for color coordinating entries but Maya appears to not accept Qt color brush settings.
 """
-import qt_widget_base as WidgetTemplate
+import qt_maya_widget_base as WidgetTemplate
 from PySide2 import QtWidgets, QtCore
 
 from qt_utils import QtMayaUtils
@@ -38,10 +38,10 @@ class OutputWidget(WidgetTemplate.QtMayaWidgetWindow):
         return
 
     def _collect_ui_elements(self):
-        self.btn_close = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_close')
-        self.btn_rerun = self.widget_ui.findChild(QtWidgets.QPushButton, 'btn_rerun')
+        self.btn_close = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_close')
+        self.btn_rerun = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_rerun')
 
-        self.output_list = self.widget_ui.findChild(QtWidgets.QListWidget, 'output_list')
+        self.output_list = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'output_list')
 
         return
 
