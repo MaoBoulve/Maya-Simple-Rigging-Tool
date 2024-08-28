@@ -33,7 +33,7 @@ class QtMayaWidget(QtWidgets.QDialog):
     Qt Widget template base. Defines abstract methods for connecting to Maya & Python
 
     __init__ calls abstract methods in order:
-        1. _init_ui_file
+        1. _initialize_qt_file
         2. _collect_ui_elements
         3. _initialize_ui_element_states
         4. _create_ui_connections_to_class_functions
@@ -41,23 +41,47 @@ class QtMayaWidget(QtWidgets.QDialog):
     super().__init__() must be called in deriving classes if __init__ is overridden
     """
 
-    #TODO: declare QWidget instance as an abstract property
-    # https://stackoverflow.com/questions/2736255/abstract-attributes-in-python
-
     def __init__(self, parent=_get_maya_window()):
         """
         Maya Widget init call
         """
+        self._QWidget_instance = None
 
-        super(QtMayaWidget, self).__init__(parent)
+        super().__init__(parent)
 
-        self._QWidget_instance = None # QtWidget_instance is QWidget container holding all buttons, text, etc.
+        self._initialize_qt_file()
         self._collect_ui_elements()
         self._initialize_ui_element_states()
         self._create_ui_connections_to_class_functions()
 
         return
 
+    @property
+    def QWidget_instance(self):
+        """
+        QtWidget_class_instance is QWidget container holding all buttons, text, etc. Used for findChild calls in
+        collect_ui_elements.
+        """
+        if self._QWidget_instance is None:
+            raise ValueError("Missing QWidget property")
+
+        return self._QWidget_instance
+
+    @QWidget_instance.setter
+    def QWidget_instance(self, value):
+
+        if value is None:
+            raise ValueError("Cannot have Null QWidget instance")
+
+        self._QWidget_instance = value
+
+    @abstractmethod
+    def _initialize_qt_file(self):
+        """
+        Initialize ui from local qt file
+        """
+
+        print("-- Deriving class needs to override '_initialize_qt_file ")
 
     @abstractmethod
     def _collect_ui_elements(self):
@@ -107,11 +131,11 @@ class QtMayaWidgetWindow(QtMayaWidget):
         :param window_title: window title displayed in Maya
         :param window_object_name: window name for python indexing
         """
+
         self.filepath = filepath
 
         self.window_title = window_title
         self.window_object_name = window_object_name
-        self._init_ui_file()
 
         super().__init__()
 
@@ -119,7 +143,7 @@ class QtMayaWidgetWindow(QtMayaWidget):
 
         return
 
-    def _init_ui_file(self):
+    def _initialize_qt_file(self):
         """
         Loading Qt Widget file via local directory search. Initializes widget window with instance variables.
         """
@@ -137,8 +161,6 @@ class QtMayaWidgetWindow(QtMayaWidget):
         loader = QtUiTools.QUiLoader()
         self.QWidget_instance = loader.load(qt_ui_file)
 
-        self.set_QWidget_instance(loader.load(qt_ui_file))
-
         # Set the object name
         self.setObjectName(self.window_object_name)
         # Set the title on the Parent Widget
@@ -149,6 +171,7 @@ class QtMayaWidgetWindow(QtMayaWidget):
         qt_ui_file.close()
 
         return
+
 
     @abstractmethod
     def _collect_ui_elements(self):
@@ -204,10 +227,28 @@ class QtMayaNestedWidget(QtMayaWidget):
     -create_ui_connections_to_class_functions.
     """
 
-    def __init__(self, tab_widget_parent):
+
+    def __init__(self, widget_container):
         """
         Init call
+        :type widget_container: QWidget container for UI elements
         """
-        self.widget_parent = tab_widget_parent
+        self.QWidget_instance = widget_container
         super().__init__()
+
+        return
+
+    @abstractmethod
+    def _collect_ui_elements(self):
+        print("Need to override collect_ui_elements")
+        return
+
+    @abstractmethod
+    def _initialize_ui_element_states(self):
+        print("Need to override initialize_ui_element_states")
+        return
+
+    @abstractmethod
+    def _create_ui_connections_to_class_functions(self):
+        print("Need to override create_ui_connections_to_class_functions")
         return

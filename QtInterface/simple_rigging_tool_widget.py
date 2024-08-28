@@ -11,5 +11,35 @@ from PySide2 import QtWidgets
 import qt_maya_widget_base as WidgetTemplate
 from qt_utils import QtMayaUtils, QtMetadataUtils
 
+class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
+    """
+    Simple rig tool widget. Contains following nested QWidgets:
 
+    - WeightPaintingTabWidget
+    """
 
+    def __init__(self):
+
+        self.weight_paint_tab = None
+
+        super().__init__(filepath=__file__, window_title="Simple Rigging Tool",
+                         window_object_name="simpleRigToolWindow")
+
+    def _collect_ui_elements(self):
+        pass
+
+    def _initialize_ui_element_states(self):
+        pass
+
+    def _create_ui_connections_to_class_functions(self):
+        pass
+
+class WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
+    def _collect_ui_elements(self):
+        pass
+
+    def _initialize_ui_element_states(self):
+        pass
+
+    def _create_ui_connections_to_class_functions(self):
+        pass
