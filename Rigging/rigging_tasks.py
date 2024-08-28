@@ -44,12 +44,13 @@ def create_rig_base(rig_type):
     print("Create rig base")
     # todo LATER: create rig base??
 
-def set_mesh_weight_paint_from_joint(skinned_mesh, joint):
+def set_mesh_weight_paint_influence_from_joint(skinned_mesh, joint_influence, joint):
     """
     Sets skinned mesh to full rig influence to the single joint passed in
 
     :param skinned_mesh: Maya skinned mesh
     :param joint: Maya joint object
+    :param joint_influence: 0-1 float value
     """
     print("Flood weight paint")
 
@@ -58,7 +59,7 @@ def set_mesh_weight_paint_from_joint(skinned_mesh, joint):
     skin_cluster = skin_cluster[0]
 
     # doing a single skinPercent call is optimal and expected
-    pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, 1.0))
+    pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, joint_influence))
 
     return
 

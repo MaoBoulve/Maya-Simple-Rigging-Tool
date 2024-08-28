@@ -199,7 +199,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="page_WeightMesh">
             <property name="geometry">
@@ -674,6 +674,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="btn_close">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
         <string>Close</string>
        </property>

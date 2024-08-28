@@ -10,6 +10,7 @@ from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
 from qt_utils import QtMayaUtils, QtMetadataUtils
+from rigging_commands import BackEndCommands
 
 class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
     """
@@ -59,6 +60,16 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         self.btn_assignWeightVertex = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_assignWeightVertex')
         self.btn_applyVertexPaint = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_applyVertexPaint')
 
+        self.list_weightJoint = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'list_weightJoint')
+        self.list_meshPaint = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'list_meshPaint')
+        self.list_vertexPaint = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'list_vertexPaint')
+
+        self.spinBox_meshWeight = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox, 'doubleSpinBox_meshWeight')
+        self.spinBox_vertexWeight = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox, 'doubleSpinBox_vertexWeight')
+
+        return
+
+
     def _initialize_ui_element_states(self):
         pass
 
@@ -71,15 +82,81 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
     def _on_btn_assignWeightPaintJoint_clicked(self):
         print("_on_btn_assignWeightPaintJoint_clicked")
+        self._assign_selected_joint_as_weight_paint_source()
+
+    def _assign_selected_joint_as_weight_paint_source(self):
+        # TODO: retrieve selected maya joint
+        # TODO: validate is joint
+        # TODO: pass to back end
+        # TODO: update UI
+        pass
 
     def _on_btn_assignWeightMesh_clicked(self):
         print("_on_btn_assignWeightMesh_clicked")
+        self._assign_selected_mesh_as_weight_paint_target()
+
+    def _assign_selected_mesh_as_weight_paint_target(self):
+        # TODO: retrieve selected maya mesh
+        # TODO: validate is mesh
+        # TODO: pass to back end
+        # TODO: update UI
+        pass
 
     def _on_btn_applyMeshPaint_clicked(self):
         print("_on_btn_applyMeshPaint_clicked")
+        self._apply_new_mesh_weight_paint()
+
+    def _apply_new_mesh_weight_paint(self):
+        # TODO: retrieve current spinBox value
+        # TODO: call backend
+        pass
 
     def _on_btn_assignWeightVertex_clicked(self):
         print("_on_btn_assignWeightVertex_clicked")
+        self._assign_selected_vertex_as_weight_paint_target()
+
+    def _assign_selected_vertex_as_weight_paint_target(self):
+        # TODO: retrieve selected maya vertex
+        # TODO: validate is from same object
+        # TODO: pass to back end
+        # TODO: update UI
+        pass
 
     def _on_btn_applyVertexPaint_clicked(self):
         print("_on_btn_applyVertexPaint_clicked")
+        self._apply_new_vertex_weight_paint()
+
+    def _apply_new_vertex_weight_paint(self):
+        # TODO: retrieve current spinBox value
+        # TODO: call backend
+        pass
+
+class _DataHandler:
+    """
+    Data handler class for connections and dependencies on Rigging module
+    """
+
+    @classmethod
+    def update_weight_paint_joint(cls, new_joint):
+        BackEndCommands.WeightPainting.set_weight_paint_joint(new_joint)
+        return
+
+    @classmethod
+    def update_mesh_to_paint(cls, new_mesh):
+        BackEndCommands.WeightPainting.set_mesh_to_paint(new_mesh)
+        return
+
+    @classmethod
+    def update_vertex_to_paint(cls, new_vertex_list):
+        BackEndCommands.WeightPainting.set_vertex_list_to_paint(new_vertex_list)
+        return
+
+    @classmethod
+    def apply_mesh_weight_paint(cls, weight_paint_value):
+        BackEndCommands.WeightPainting.apply_mesh_weight_paint(weight_paint_value)
+        return
+
+    @classmethod
+    def apply_vertex_weight_paint(cls, weight_paint_value):
+        BackEndCommands.WeightPainting.apply_vertex_weight_paint(weight_paint_value)
+        return
