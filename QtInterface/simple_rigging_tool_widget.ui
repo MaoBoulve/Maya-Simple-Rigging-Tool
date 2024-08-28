@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>284</width>
-    <height>387</height>
+    <height>391</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -170,6 +170,11 @@
                <property name="layoutDirection">
                 <enum>Qt::LeftToRight</enum>
                </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton{
+    background-color: midnightblue;
+}</string>
+               </property>
                <property name="text">
                 <string>Assign New Joint</string>
                </property>
@@ -194,7 +199,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page_WeightMesh">
             <property name="geometry">
@@ -313,7 +318,12 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_2">
+                  <widget class="QPushButton" name="btn_assignWeightMesh">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+    background-color: midnightblue;
+}</string>
+                   </property>
                    <property name="text">
                     <string>Assign New Mesh</string>
                    </property>
@@ -396,7 +406,12 @@
                   <enum>QLayout::SetFixedSize</enum>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="btn_MeshPaint">
+                  <widget class="QPushButton" name="btn_applyMeshPaint">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+    background-color: midnightblue;
+}</string>
+                   </property>
                    <property name="text">
                     <string>Apply Mesh Weight Paint </string>
                    </property>
@@ -510,7 +525,12 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_3">
+                  <widget class="QPushButton" name="btn_assignWeightVertex">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+    background-color: midnightblue;
+}</string>
+                   </property>
                    <property name="text">
                     <string>Assign New Vertices</string>
                    </property>
@@ -587,7 +607,12 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_16">
                  <item>
-                  <widget class="QPushButton" name="btn_vertexPaint">
+                  <widget class="QPushButton" name="btn_applyVertexPaint">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+    background-color: midnightblue;
+}</string>
+                   </property>
                    <property name="text">
                     <string>Apply Vertex Weight Paint</string>
                    </property>

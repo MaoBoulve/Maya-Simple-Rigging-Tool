@@ -20,26 +20,66 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
 
     def __init__(self):
 
+        self.btn_close = None
         self.weight_paint_tab = None
 
         super().__init__(filepath=__file__, window_title="Simple Rigging Tool",
                          window_object_name="simpleRigToolWindow")
 
     def _collect_ui_elements(self):
-        pass
+
+        self.btn_close = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_close')
+
+        # individual tabs of QTabWidgets are QWidgets
+        weight_paint_tab_widget = self.QWidget_instance.findChild(QtWidgets.QWidget, 'tab_weightPaint')
+        self.weight_paint_tab = _WeightPaintingTabWidget(weight_paint_tab_widget)
+
+        return
 
     def _initialize_ui_element_states(self):
         pass
 
     def _create_ui_connections_to_class_functions(self):
-        pass
+        self.btn_close.clicked.connect(self._on_btn_close_clicked)
 
-class WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
+    def _on_btn_close_clicked(self):
+        self._close_window()
+        return
+
+class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
+
+
+    def __init__(self, widget_container):
+        super().__init__(widget_container)
+
     def _collect_ui_elements(self):
-        pass
+        self.btn_assignWeightPaintJoint = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_assignWeightPaintJoint')
+        self.btn_assignWeightMesh = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_assignWeightMesh')
+        self.btn_applyMeshPaint = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_applyMeshPaint')
+        self.btn_assignWeightVertex = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_assignWeightVertex')
+        self.btn_applyVertexPaint = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_applyVertexPaint')
 
     def _initialize_ui_element_states(self):
         pass
 
     def _create_ui_connections_to_class_functions(self):
-        pass
+        self.btn_assignWeightPaintJoint.clicked.connect(self._on_btn_assignWeightPaintJoint_clicked)
+        self.btn_assignWeightMesh.clicked.connect(self._on_btn_assignWeightMesh_clicked)
+        self.btn_applyMeshPaint.clicked.connect(self._on_btn_applyMeshPaint_clicked)
+        self.btn_assignWeightVertex.clicked.connect(self._on_btn_assignWeightVertex_clicked)
+        self.btn_applyVertexPaint.clicked.connect(self._on_btn_applyVertexPaint_clicked)
+
+    def _on_btn_assignWeightPaintJoint_clicked(self):
+        print("_on_btn_assignWeightPaintJoint_clicked")
+
+    def _on_btn_assignWeightMesh_clicked(self):
+        print("_on_btn_assignWeightMesh_clicked")
+
+    def _on_btn_applyMeshPaint_clicked(self):
+        print("_on_btn_applyMeshPaint_clicked")
+
+    def _on_btn_assignWeightVertex_clicked(self):
+        print("_on_btn_assignWeightVertex_clicked")
+
+    def _on_btn_applyVertexPaint_clicked(self):
+        print("_on_btn_applyVertexPaint_clicked")

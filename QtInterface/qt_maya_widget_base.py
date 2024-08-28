@@ -45,7 +45,6 @@ class QtMayaWidget(QtWidgets.QDialog):
         """
         Maya Widget init call
         """
-        self._QWidget_instance = None
 
         super().__init__(parent)
 
@@ -233,10 +232,18 @@ class QtMayaNestedWidget(QtMayaWidget):
         Init call
         :type widget_container: QWidget container for UI elements
         """
+
         self.QWidget_instance = widget_container
         super().__init__()
 
         return
+
+    def _initialize_qt_file(self):
+        """
+        Nested widgets should already be initialized, override function if other assets need to be loaded on init
+        before _collect_ui_elements
+        """
+        pass
 
     @abstractmethod
     def _collect_ui_elements(self):
