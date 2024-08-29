@@ -8,12 +8,14 @@ sys.path.append('/Users/cmendoza/Documents/maya/scripts/Maya-Simple-Rigging-Tool
 
 # initial import
 import rigging_tasks
+import rigging_commands
 import simple_rigging_tool_widget
 import importlib
 import qt_maya_widget_base
 
 # reimport
 importlib.reload(rigging_tasks)
+importlib.reload(rigging_commands)
 importlib.reload(simple_rigging_tool_widget)
 importlib.reload(qt_maya_widget_base)
 

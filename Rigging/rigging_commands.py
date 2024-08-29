@@ -5,6 +5,8 @@ class BackEndCommands:
     Command class for functions involving data handling of rigging tasks
     """
 
+
+
     class WeightPainting:
         # TODO: save class variables in metadata instead
 
@@ -14,18 +16,42 @@ class BackEndCommands:
 
         @classmethod
         def set_weight_paint_joint(cls, new_joint):
-            cls._weight_paint_joint = new_joint
-            return
+            """
+            :param new_joint: maya selected joint
+            :return: is_success bool - set was success
+            """
+
+            is_valid = rigging_tasks.check_is_user_selected_a_valid_joint(new_joint)
+
+            if is_valid:
+                cls._weight_paint_joint = new_joint
+
+            return is_valid
 
         @classmethod
         def set_mesh_to_paint(cls, new_mesh):
-            cls._mesh_to_paint = new_mesh
-            return
+            """
+            :param new_mesh: maya selected joint
+            :return: is_success - set was success
+            """
+            is_valid = rigging_tasks.check_is_user_selected_a_valid_mesh(new_mesh)
+
+            if is_valid:
+                cls._mesh_to_paint = new_mesh
+            return is_valid
 
         @classmethod
         def set_vertex_list_to_paint(cls, vertex_list):
-            cls._vertex_list_to_paint = vertex_list
-            return
+            """
+            :param vertex_list: maya selected joint
+            :return: is_success - set was success
+            """
+            is_valid = rigging_tasks.check_is_user_selected_valid_vertex_list(vertex_list)
+
+            if is_valid:
+                cls._vertex_list_to_paint = vertex_list
+
+            return is_valid
 
         @classmethod
         def apply_mesh_weight_paint(cls, weight_paint_value):

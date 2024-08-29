@@ -123,3 +123,54 @@ def set_vertex_weight_paint_influence_from_joint(selected_vertex, joint_influenc
     pm.skinPercent(skin_cluster, vertex_list, transformValue=(joint, joint_influence))
 
     return
+
+def check_is_user_selected_a_valid_joint(user_selected_object):
+
+    if len(user_selected_object) != 1:
+        # Multiple or zero objects selected
+        return False
+
+
+    if pm.objectType(user_selected_object) != 'joint':
+        # Object is not a joint object
+        return False
+
+    return True
+
+def check_is_user_selected_a_valid_mesh(user_selected_object):
+
+    if len(user_selected_object) != 1:
+        # Multiple or zero objects selected
+        return False
+
+
+    if pm.objectType(user_selected_object) != 'mesh' and pm.objectType(user_selected_object) != 'transform':
+        # Object is not a mesh/shape object
+        return False
+
+    return True
+
+def check_is_user_selected_valid_vertex_list(user_selected_list):
+
+    if len(user_selected_list) == 0:
+
+        # Zero objects selected
+        return False
+
+
+    invalid_list = [vertex for vertex in user_selected_list if '.vtx' not in str(vertex)]
+
+    if invalid_list:
+        # Non-vertex selected
+        return False
+
+    single_vertex = user_selected_list[0]
+    skinned_mesh_name = single_vertex.split('.vtx[')[0]
+
+    invalid_list = [vertex for vertex in user_selected_list if skinned_mesh_name not in str(vertex)]
+
+    if invalid_list:
+        # Vertex from multiple different shapes selected
+        return False
+
+    return True

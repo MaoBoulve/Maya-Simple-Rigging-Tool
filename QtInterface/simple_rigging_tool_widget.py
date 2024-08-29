@@ -71,6 +71,7 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _initialize_ui_element_states(self):
+        # TODO: disable weight paint buttons if corresponding joint/mesh/vertex is default
         pass
 
     def _create_ui_connections_to_class_functions(self):
@@ -85,50 +86,102 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         self._assign_selected_joint_as_weight_paint_source()
 
     def _assign_selected_joint_as_weight_paint_source(self):
-        # TODO: retrieve selected maya joint
-        # TODO: validate is joint
-        # TODO: pass to back end
-        # TODO: update UI
-        pass
+        """
+        Checks current selected maya object for single joint. If valid, sets as new joint in back end and in widget
+        """
+
+        is_success, new_joint = _DataHandler.update_weight_paint_joint()
+
+        if is_success:
+            self._update_current_weight_paint_joint(new_joint)
+
+        return
+
+    def _update_current_weight_paint_joint(self, new_joint_name):
+        """
+        Removes prior item, adds new item
+        :param new_joint_name: string entry
+        """
+
+        self.list_weightJoint.takeItem(0)
+        self.list_weightJoint.addItem(new_joint_name)
+
+        return
 
     def _on_btn_assignWeightMesh_clicked(self):
         print("_on_btn_assignWeightMesh_clicked")
         self._assign_selected_mesh_as_weight_paint_target()
 
     def _assign_selected_mesh_as_weight_paint_target(self):
-        # TODO: retrieve selected maya mesh
-        # TODO: validate is mesh
-        # TODO: pass to back end
-        # TODO: update UI
-        pass
+
+
+        is_success, new_mesh = _DataHandler.update_mesh_to_paint()
+
+        if is_success:
+            self._update_current_mesh(new_mesh)
+
+        return
+
+    def _update_current_mesh(self, new_mesh_name):
+        """
+        Removes prior item, adds new item
+        :param new_mesh_name: string entry
+        """
+
+        self.list_meshPaint.takeItem(0)
+        self.list_meshPaint.addItem(new_mesh_name)
+
+        return
 
     def _on_btn_applyMeshPaint_clicked(self):
         print("_on_btn_applyMeshPaint_clicked")
         self._apply_new_mesh_weight_paint()
 
     def _apply_new_mesh_weight_paint(self):
-        # TODO: retrieve current spinBox value
-        # TODO: call backend
-        pass
+        """
+        Gets current spinbox value for mesh weight paint, calls back end system to apply mesh weight paint
+        """
+        weight_paint_value = self.spinBox_meshWeight.value(0)
+        _DataHandler.apply_mesh_weight_paint(weight_paint_value)
+
+        return
 
     def _on_btn_assignWeightVertex_clicked(self):
         print("_on_btn_assignWeightVertex_clicked")
         self._assign_selected_vertex_as_weight_paint_target()
 
     def _assign_selected_vertex_as_weight_paint_target(self):
-        # TODO: retrieve selected maya vertex
-        # TODO: validate is from same object
-        # TODO: pass to back end
-        # TODO: update UI
-        pass
+
+        is_success, vertex_count = _DataHandler.update_vertex_to_paint()
+
+        if is_success:
+            self._update_current_vertex(vertex_count)
+
+        return
+
+    def _update_current_vertex(self, new_vertex_count):
+        """
+        Removes prior item, adds new item
+        :param new_vertex_count: int count
+        """
+
+        self.list_vertexPaint.takeItem(0)
+        self.list_vertexPaint.addItem(f"{new_vertex_count} Vertex selected")
+
+        return
 
     def _on_btn_applyVertexPaint_clicked(self):
         print("_on_btn_applyVertexPaint_clicked")
         self._apply_new_vertex_weight_paint()
 
     def _apply_new_vertex_weight_paint(self):
-        # TODO: retrieve current spinBox value
-        # TODO: call backend
+        """
+        Gets current spinbox value for mesh weight paint, calls back end system to apply mesh weight paint
+        """
+
+        weight_paint_value = self.spinBox_vertexWeight.value()
+        _DataHandler.apply_vertex_weight_paint(weight_paint_value)
+
         pass
 
 class _DataHandler:
@@ -137,19 +190,55 @@ class _DataHandler:
     """
 
     @classmethod
-    def update_weight_paint_joint(cls, new_joint):
-        BackEndCommands.WeightPainting.set_weight_paint_joint(new_joint)
-        return
+    def update_weight_paint_joint(cls):
+
+        new_joint = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = BackEndCommands.WeightPainting.set_weight_paint_joint(new_joint)
+
+        if is_success:
+            new_joint_name = str(new_joint[0])
+
+        else:
+            print("Invalid joint")
+            # TODO: throw error
+
+            new_joint_name = ""
+
+        return is_success, new_joint_name
 
     @classmethod
-    def update_mesh_to_paint(cls, new_mesh):
-        BackEndCommands.WeightPainting.set_mesh_to_paint(new_mesh)
-        return
+    def update_mesh_to_paint(cls):
+
+
+        new_mesh = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = BackEndCommands.WeightPainting.set_mesh_to_paint(new_mesh)
+
+        if is_success:
+            new_mesh_name = str(new_mesh[0])
+
+        else:
+            print("Invalid mesh")
+            # TODO: throw error
+            new_mesh_name = ""
+
+        return is_success, new_mesh_name
 
     @classmethod
-    def update_vertex_to_paint(cls, new_vertex_list):
-        BackEndCommands.WeightPainting.set_vertex_list_to_paint(new_vertex_list)
-        return
+    def update_vertex_to_paint(cls):
+
+        new_vertex_list = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = BackEndCommands.WeightPainting.set_vertex_list_to_paint(new_vertex_list)
+
+        if is_success:
+            # TODO: handle slices in distinct count
+            vertex_count = len(new_vertex_list)
+
+        else:
+            print("Invalid vertex list")
+            # TODO: throw error
+            vertex_count = -1
+
+        return is_success, vertex_count
 
     @classmethod
     def apply_mesh_weight_paint(cls, weight_paint_value):
