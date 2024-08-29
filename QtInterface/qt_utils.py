@@ -76,6 +76,30 @@ class QtMayaUtils:
         material_list = list(set(material_list))
         return material_list
 
+    @staticmethod
+    def count_distinct_vertex_from_sliced_list(vertex_list):
+        full_vertex_list = []
+
+        for list_entry in vertex_list:
+            list_entry = str(list_entry)
+
+            if ':' in list_entry:
+                shape_name = list_entry.split('.vtx')[0]
+
+                range_start, range_end = list_entry.split(':', 1)
+                range_start = int(range_start.split('[')[1])
+                range_end = int(range_end.split(']')[0]) + 1
+
+                #pCubeShape1 + .vtx + [ + number + ]
+
+                for vtx_num in range(range_start, range_end):
+                    full_vertex_list.append(f"{shape_name}.vtx[{vtx_num}]")
+
+            else:
+                full_vertex_list.append(list_entry)
+
+        return len(full_vertex_list)
+
 
 class QtMetadataUtils:
     """

@@ -141,7 +141,7 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         """
         Gets current spinbox value for mesh weight paint, calls back end system to apply mesh weight paint
         """
-        weight_paint_value = self.spinBox_meshWeight.value(0)
+        weight_paint_value = self.spinBox_meshWeight.value()
         _DataHandler.apply_mesh_weight_paint(weight_paint_value)
 
         return
@@ -230,8 +230,7 @@ class _DataHandler:
         is_success = BackEndCommands.WeightPainting.set_vertex_list_to_paint(new_vertex_list)
 
         if is_success:
-            # TODO: handle slices in distinct count
-            vertex_count = len(new_vertex_list)
+            vertex_count = QtMayaUtils.count_distinct_vertex_from_sliced_list(new_vertex_list)
 
         else:
             print("Invalid vertex list")
