@@ -22,6 +22,16 @@ class QtMayaUtils:
     """
 
     @staticmethod
+    def select_maya_object(maya_object):
+        """
+        Selects maya objects via standard pm.select() command
+        :param maya_object: List of maya objs
+        """
+
+        pm.select(maya_object)
+        return
+
+    @staticmethod
     def get_maya_object_by_name(object_name):
         """
         Returns list of maya objects matching name using pymel .ls command

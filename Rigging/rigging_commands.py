@@ -12,7 +12,7 @@ class BackEndCommands:
 
         _weight_paint_joint = None
         _mesh_to_paint = None
-        _vertex_list_to_paint = []
+        _vertex_list_to_paint = None
 
         @classmethod
         def set_weight_paint_joint(cls, new_joint):
@@ -24,7 +24,7 @@ class BackEndCommands:
             is_valid = rigging_tasks.check_is_user_selected_a_valid_joint(new_joint)
 
             if is_valid:
-                cls._weight_paint_joint = new_joint
+                cls._weight_paint_joint = new_joint[0]
 
             return is_valid
 
@@ -37,7 +37,7 @@ class BackEndCommands:
             is_valid = rigging_tasks.check_is_user_selected_a_valid_mesh(new_mesh)
 
             if is_valid:
-                cls._mesh_to_paint = new_mesh
+                cls._mesh_to_paint = new_mesh[0]
             return is_valid
 
         @classmethod
@@ -55,17 +55,27 @@ class BackEndCommands:
 
         @classmethod
         def apply_mesh_weight_paint(cls, weight_paint_value):
-            rigging_tasks.set_mesh_weight_paint_influence_from_joint(skinned_mesh=cls._mesh_to_paint,
-                                                                     joint_influence=weight_paint_value,
-                                                                     joint=cls._weight_paint_joint)
+            rigging_tasks.set_mesh_weight_paint_influence_from_joint(skinned_mesh=cls._mesh_to_paint, joint_influence=weight_paint_value, joint=cls._weight_paint_joint)
             return
 
         @classmethod
         def apply_vertex_weight_paint(cls, weight_paint_value):
-            rigging_tasks.set_vertex_weight_paint_influence_from_joint(selected_vertex=cls._vertex_list_to_paint,
-                                                                       joint_influence=weight_paint_value,
-                                                                       joint=cls._weight_paint_joint)
+
+            rigging_tasks.set_vertex_weight_paint_influence_from_joint(selected_vertex=cls._vertex_list_to_paint, joint_influence=weight_paint_value, joint=cls._weight_paint_joint)
             return
+
+        @classmethod
+        def get_current_joint(cls):
+            return cls._weight_paint_joint
+
+        @classmethod
+        def get_current_mesh(cls):
+            return cls._mesh_to_paint
+
+        @classmethod
+        def get_current_vertex_list(cls):
+            return cls._vertex_list_to_paint
+
 
 class FrontEndCommands:
     """

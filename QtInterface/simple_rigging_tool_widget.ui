@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>284</width>
-    <height>391</height>
+    <height>479</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -199,7 +199,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="page_WeightMesh">
             <property name="geometry">
@@ -407,6 +407,9 @@
                  </property>
                  <item>
                   <widget class="QPushButton" name="btn_applyMeshPaint">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
     background-color: midnightblue;
@@ -428,8 +431,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>183</width>
-              <height>185</height>
+              <width>256</width>
+              <height>159</height>
              </rect>
             </property>
             <attribute name="label">
@@ -502,7 +505,7 @@
                    </property>
                    <item>
                     <property name="text">
-                     <string>0 Vertices</string>
+                     <string>--</string>
                     </property>
                    </item>
                   </widget>
@@ -608,6 +611,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_16">
                  <item>
                   <widget class="QPushButton" name="btn_applyVertexPaint">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
     background-color: midnightblue;
@@ -652,6 +658,16 @@
    </item>
    <item>
     <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QListWidget" name="list_output"/>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

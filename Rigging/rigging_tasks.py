@@ -9,9 +9,6 @@ def test():
     # set_mesh_weight_paint_to_joint(pm.ls(sl=True)[0], pm.ls('test_flood')[0])
     set_vertex_weight_paint_influence_from_joint(pm.ls(sl=True), 0.5, pm.ls('test_flood')[0])
 
-# TODO: display currently selected mesh setting weight paint on in UI
-# TODO: display skeleton joint used for weight paint
-# TODO: display vertexes used for weight paint
 # TODO: UNDO ACTION
 
 def create_control_shape_on_joint(joint):
@@ -56,10 +53,21 @@ def set_mesh_weight_paint_influence_from_joint(skinned_mesh, joint_influence, jo
 
     shape_node = __get_shape_node(skinned_mesh)
     skin_cluster = __get_skin_cluster_nodes(shape_node)
+
+    if len(skin_cluster) == 0:
+        print("Mesh not rigged")
+        # TODO: save error
+        return
+
     skin_cluster = skin_cluster[0]
 
     # doing a single skinPercent call is optimal and expected
-    pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, joint_influence))
+    try:
+        pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, joint_influence))
+
+    except RuntimeError as error_print:
+        print(f"Error in attempting to apply weight paint: {error_print}")
+        # TODO: catch error for non-matching rig
 
     return
 
@@ -96,9 +104,10 @@ def set_vertex_weight_paint_influence_from_joint(selected_vertex, joint_influenc
     :param selected_vertex: List of vertex maya objects
     :param joint_influence: Float value between 0-1
     :param joint: Joint object
-    :return:
+    :return: is_success bool
     """
     print("Set vertex influence")
+
 
     # A selected vertex will have name format [shapeNode].vtx[i]
 
@@ -113,16 +122,24 @@ def set_vertex_weight_paint_influence_from_joint(selected_vertex, joint_influenc
     skinned_mesh_name = single_vertex.split('.vtx[')[0]
     skinned_mesh = pm.ls(skinned_mesh_name)[0]
 
-    # TODO: deal with user selecting vertex from multiple
-
     shape_node = __get_shape_node(skinned_mesh)
     skin_cluster = __get_skin_cluster_nodes(shape_node)
+
+    if len(skin_cluster) == 0:
+        print("Mesh not rigged")
+        # TODO: save error
+        return
+
     skin_cluster = skin_cluster[0]
 
+    # TODO: catch error for non-rig
     # doing a single skinPercent call is optimal and expected
-    pm.skinPercent(skin_cluster, vertex_list, transformValue=(joint, joint_influence))
-
-    return
+    try:
+        pm.skinPercent(skin_cluster, vertex_list, transformValue=(joint, joint_influence))
+    except RuntimeError as error_print:
+        print(f"Error in attempting to apply weight paint: {error_print}")
+        # TODO: catch error for non-matching rig
+    return True
 
 def check_is_user_selected_a_valid_joint(user_selected_object):
 

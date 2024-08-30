@@ -30,10 +30,11 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
     def _collect_ui_elements(self):
 
         self.btn_close = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_close')
+        self.list_output = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'list_output')
 
         # individual tabs of QTabWidgets are QWidgets
         weight_paint_tab_widget = self.QWidget_instance.findChild(QtWidgets.QWidget, 'tab_weightPaint')
-        self.weight_paint_tab = _WeightPaintingTabWidget(weight_paint_tab_widget)
+        self.weight_paint_tab = _WeightPaintingTabWidget(weight_paint_tab_widget, self)
 
         return
 
@@ -47,10 +48,16 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
         self._close_window()
         return
 
+    def populate_output_widget(self):
+        # TODO: fill output widget from a metadata node
+        print("Update output widget")
+        return
 class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
-    def __init__(self, widget_container):
+    def __init__(self, widget_container, parent_window_instance):
+        self.parent_window = parent_window_instance
+
         super().__init__(widget_container)
 
     def _collect_ui_elements(self):
@@ -74,6 +81,8 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         # TODO: disable weight paint buttons if corresponding joint/mesh/vertex is default
         pass
 
+
+
     def _create_ui_connections_to_class_functions(self):
         self.btn_assignWeightPaintJoint.clicked.connect(self._on_btn_assignWeightPaintJoint_clicked)
         self.btn_assignWeightMesh.clicked.connect(self._on_btn_assignWeightMesh_clicked)
@@ -81,9 +90,16 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         self.btn_assignWeightVertex.clicked.connect(self._on_btn_assignWeightVertex_clicked)
         self.btn_applyVertexPaint.clicked.connect(self._on_btn_applyVertexPaint_clicked)
 
+        self.list_weightJoint.itemClicked.connect(self._on_jointList_item_clicked)
+        self.list_meshPaint.itemClicked.connect(self._on_meshList_item_clicked)
+        self.list_vertexPaint.itemClicked.connect(self._on_vertexList_item_clicked)
+
+        return
+
     def _on_btn_assignWeightPaintJoint_clicked(self):
-        print("_on_btn_assignWeightPaintJoint_clicked")
         self._assign_selected_joint_as_weight_paint_source()
+        self._call_output_update()
+        return
 
     def _assign_selected_joint_as_weight_paint_source(self):
         """
@@ -94,6 +110,7 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         if is_success:
             self._update_current_weight_paint_joint(new_joint)
+            self._check_to_enable_weight_paint_buttons()
 
         return
 
@@ -108,9 +125,30 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         return
 
+    def _check_to_enable_weight_paint_buttons(self):
+        mesh_valid = _DataHandler.check_is_mesh_paint_parameters_set()
+
+        if mesh_valid:
+            self.btn_applyMeshPaint.setEnabled(True)
+
+        vertex_valid = _DataHandler.check_is_vertex_paint_parameters_set()
+
+        if vertex_valid:
+            self.btn_applyVertexPaint.setEnabled(True)
+
+        return
+
+    def _call_output_update(self):
+        """
+        Calls SimpleRigtoolWindowWidget function for populate output widget
+        """
+        self.parent_window.populate_output_widget()
+        return
+
     def _on_btn_assignWeightMesh_clicked(self):
-        print("_on_btn_assignWeightMesh_clicked")
         self._assign_selected_mesh_as_weight_paint_target()
+        self._call_output_update()
+        return
 
     def _assign_selected_mesh_as_weight_paint_target(self):
 
@@ -119,6 +157,7 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         if is_success:
             self._update_current_mesh(new_mesh)
+            self._check_to_enable_weight_paint_buttons()
 
         return
 
@@ -134,8 +173,9 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_applyMeshPaint_clicked(self):
-        print("_on_btn_applyMeshPaint_clicked")
         self._apply_new_mesh_weight_paint()
+        self._call_output_update()
+        return
 
     def _apply_new_mesh_weight_paint(self):
         """
@@ -147,8 +187,9 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_assignWeightVertex_clicked(self):
-        print("_on_btn_assignWeightVertex_clicked")
         self._assign_selected_vertex_as_weight_paint_target()
+        self._call_output_update()
+        return
 
     def _assign_selected_vertex_as_weight_paint_target(self):
 
@@ -156,6 +197,7 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         if is_success:
             self._update_current_vertex(vertex_count)
+            self._check_to_enable_weight_paint_buttons()
 
         return
 
@@ -171,8 +213,9 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_applyVertexPaint_clicked(self):
-        print("_on_btn_applyVertexPaint_clicked")
         self._apply_new_vertex_weight_paint()
+        self._call_output_update()
+        return
 
     def _apply_new_vertex_weight_paint(self):
         """
@@ -183,6 +226,41 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
         _DataHandler.apply_vertex_weight_paint(weight_paint_value)
 
         pass
+
+    @staticmethod
+    def _on_jointList_item_clicked(item_clicked):
+        # signal emits a QListWidgetItem object
+        item_text = item_clicked.text()
+
+        if item_text == '--':
+            return
+
+        _DataHandler.select_current_joint()
+
+        return
+
+    @staticmethod
+    def _on_meshList_item_clicked(item_clicked):
+
+        item_text = item_clicked.text()
+
+        if item_text == '--':
+            return
+
+        _DataHandler.select_current_mesh()
+        return
+
+    @staticmethod
+    def _on_vertexList_item_clicked(item_clicked):
+
+        item_text = item_clicked.text()
+
+        if item_text == '--':
+            return
+
+        _DataHandler.select_current_vertex()
+
+        return
 
 class _DataHandler:
     """
@@ -248,3 +326,48 @@ class _DataHandler:
     def apply_vertex_weight_paint(cls, weight_paint_value):
         BackEndCommands.WeightPainting.apply_vertex_weight_paint(weight_paint_value)
         return
+
+    @classmethod
+    def select_current_joint(cls):
+        object_to_select = BackEndCommands.WeightPainting.get_current_joint()
+        QtMayaUtils.select_maya_object(object_to_select)
+
+        return
+
+    @classmethod
+    def select_current_mesh(cls):
+        object_to_select = BackEndCommands.WeightPainting.get_current_mesh()
+        QtMayaUtils.select_maya_object(object_to_select)
+
+        return
+
+    @classmethod
+    def select_current_vertex(cls):
+        object_to_select = BackEndCommands.WeightPainting.get_current_vertex_list()
+        QtMayaUtils.select_maya_object(object_to_select)
+
+        return
+
+    @classmethod
+    def check_is_mesh_paint_parameters_set(cls):
+        is_valid = True
+
+        joint = BackEndCommands.WeightPainting.get_current_joint()
+        mesh = BackEndCommands.WeightPainting.get_current_mesh()
+
+        if joint is None or mesh is None:
+            is_valid = False
+
+        return is_valid
+
+    @classmethod
+    def check_is_vertex_paint_parameters_set(cls):
+        is_valid = True
+
+        joint = BackEndCommands.WeightPainting.get_current_joint()
+        vertex = BackEndCommands.WeightPainting.get_current_vertex_list()
+
+        if joint is None or vertex is None:
+            is_valid = False
+
+        return is_valid
