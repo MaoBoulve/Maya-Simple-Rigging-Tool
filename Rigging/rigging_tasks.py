@@ -82,6 +82,7 @@ class WeightPainting:
         Gets shape node depending on shape method
         :param object_to_get:
         """
+
         if pm.objectType(object_to_get) == 'mesh':
             return object_to_get
         elif pm.objectType(object_to_get) == 'transform':

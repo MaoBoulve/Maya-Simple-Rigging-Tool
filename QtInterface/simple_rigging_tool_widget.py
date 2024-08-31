@@ -49,7 +49,9 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
         return
 
     def populate_output_widget(self):
-        # TODO: fill output widget from a metadata node
+        """
+        Populates output list widget with metadata node stored entries
+        """
 
         output_queue = _DataHandler.retrieve_current_output_queue()
 
@@ -86,8 +88,21 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _initialize_ui_element_states(self):
-        #
-        pass
+
+        joint, mesh, vertex = _DataHandler.get_current_weight_paint_settings()
+
+        if joint:
+            self._update_current_weight_paint_joint(joint)
+
+        if mesh:
+            self._update_current_mesh(mesh)
+
+        if vertex:
+            self._update_current_vertex(vertex)
+
+        self._check_to_enable_weight_paint_buttons()
+
+        return
 
 
 
@@ -388,3 +403,12 @@ class _DataHandler:
     def append_to_output_queue(cls, entry):
         BackEndCommands.Output.append_to_output_queue(entry, "")
         return
+
+    @classmethod
+    def get_current_weight_paint_settings(cls):
+        joint = str(BackEndCommands.WeightPainting.get_current_joint())
+        mesh = str(BackEndCommands.WeightPainting.get_current_mesh())
+
+        vertex = BackEndCommands.WeightPainting.get_current_vertex_list()
+        vertex = QtMayaUtils.count_distinct_vertex_from_sliced_list(vertex)
+        return joint, mesh, vertex
