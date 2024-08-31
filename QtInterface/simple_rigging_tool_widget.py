@@ -50,7 +50,15 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
 
     def populate_output_widget(self):
         # TODO: fill output widget from a metadata node
-        print("Update output widget")
+
+        output_queue = _DataHandler.retrieve_current_output_queue()
+
+        for output_entry in output_queue:
+            text_entry = output_entry[0]
+
+            if text_entry != "":
+                self.list_output.addItem(text_entry)
+
         return
 class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
@@ -78,7 +86,7 @@ class _WeightPaintingTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _initialize_ui_element_states(self):
-        # TODO: disable weight paint buttons if corresponding joint/mesh/vertex is default
+        #
         pass
 
 
@@ -277,9 +285,7 @@ class _DataHandler:
             new_joint_name = str(new_joint[0])
 
         else:
-            print("Invalid joint")
-            # TODO: throw error
-
+            _DataHandler.append_to_output_queue("Selected object is not a Joint")
             new_joint_name = ""
 
         return is_success, new_joint_name
@@ -295,8 +301,8 @@ class _DataHandler:
             new_mesh_name = str(new_mesh[0])
 
         else:
-            print("Invalid mesh")
-            # TODO: throw error
+
+            _DataHandler.append_to_output_queue("Selected object is not a Mesh")
             new_mesh_name = ""
 
         return is_success, new_mesh_name
@@ -311,8 +317,8 @@ class _DataHandler:
             vertex_count = QtMayaUtils.count_distinct_vertex_from_sliced_list(new_vertex_list)
 
         else:
-            print("Invalid vertex list")
-            # TODO: throw error
+            _DataHandler.append_to_output_queue("Selected object is not a Vertex or multiple vertex from a single mesh")
+
             vertex_count = -1
 
         return is_success, vertex_count
@@ -371,3 +377,14 @@ class _DataHandler:
             is_valid = False
 
         return is_valid
+
+    @classmethod
+    def retrieve_current_output_queue(cls):
+        output_queue = BackEndCommands.Output.get_current_output_queue()
+        BackEndCommands.Output.clear_current_output_queue()
+        return output_queue
+
+    @classmethod
+    def append_to_output_queue(cls, entry):
+        BackEndCommands.Output.append_to_output_queue(entry, "")
+        return

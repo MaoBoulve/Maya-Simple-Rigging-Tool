@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>284</width>
-    <height>479</height>
+    <height>484</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -82,7 +82,6 @@
                </property>
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -206,8 +205,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>159</height>
+              <width>183</width>
+              <height>184</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -264,7 +263,6 @@
                    </property>
                    <property name="font">
                     <font>
-                     <weight>75</weight>
                      <bold>true</bold>
                     </font>
                    </property>
@@ -431,8 +429,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>159</height>
+              <width>183</width>
+              <height>216</height>
              </rect>
             </property>
             <attribute name="label">
@@ -474,7 +472,6 @@
                    </property>
                    <property name="font">
                     <font>
-                     <weight>75</weight>
                      <bold>true</bold>
                     </font>
                    </property>
@@ -636,7 +633,7 @@
               <x>0</x>
               <y>0</y>
               <width>256</width>
-              <height>159</height>
+              <height>150</height>
              </rect>
             </property>
             <attribute name="label">
@@ -648,11 +645,6 @@
         </layout>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="tab_3">
-      <attribute name="title">
-       <string>Tab 2</string>
-      </attribute>
      </widget>
     </widget>
    </item>

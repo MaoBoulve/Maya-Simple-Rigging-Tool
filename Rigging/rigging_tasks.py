@@ -1,13 +1,12 @@
 import pymel.core as pm
+import rigging_commands
 
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 def test():
-    #create_control_shape_on_joint(pm.ls(sl=True)[0])
+    print("Test")
 
-    # set_mesh_weight_paint_to_joint(pm.ls(sl=True)[0], pm.ls('test_flood')[0])
-    set_vertex_weight_paint_influence_from_joint(pm.ls(sl=True), 0.5, pm.ls('test_flood')[0])
 
 # TODO: UNDO ACTION
 
@@ -41,153 +40,154 @@ def create_rig_base(rig_type):
     print("Create rig base")
     # todo LATER: create rig base??
 
-def set_mesh_weight_paint_influence_from_joint(skinned_mesh, joint_influence, joint):
-    """
-    Sets skinned mesh to full rig influence to the single joint passed in
+def _append_to_user_output_log(new_entry):
 
-    :param skinned_mesh: Maya skinned mesh
-    :param joint: Maya joint object
-    :param joint_influence: 0-1 float value
-    """
-    print("Flood weight paint")
-
-    shape_node = __get_shape_node(skinned_mesh)
-    skin_cluster = __get_skin_cluster_nodes(shape_node)
-
-    if len(skin_cluster) == 0:
-        print("Mesh not rigged")
-        # TODO: save error
-        return
-
-    skin_cluster = skin_cluster[0]
-
-    # doing a single skinPercent call is optimal and expected
-    try:
-        pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, joint_influence))
-
-    except RuntimeError as error_print:
-        print(f"Error in attempting to apply weight paint: {error_print}")
-        # TODO: catch error for non-matching rig
-
+    rigging_commands.BackEndCommands.Output.append_to_output_queue(new_entry, "")
     return
 
+class WeightPainting:
 
-def __get_shape_node(object_to_get):
-    """
-    Gets shape node depending on shape method
-    :param object_to_get:
-    """
-    if pm.objectType(object_to_get) == 'mesh':
-        return object_to_get
-    elif pm.objectType(object_to_get) == 'transform':
-        return object_to_get.getShape()
-    else:
-        # edge case of catching a hierarchy object without shape past the initial param validation
-        return []
+    @classmethod
+    def set_mesh_weight_paint_influence_from_joint(cls, skinned_mesh, joint_influence, joint):
+        """
+        Sets skinned mesh to full rig influence to the single joint passed in
 
-def __get_skin_cluster_nodes(shape_object):
-    """
-    Gets skin cluster nodes
+        :param skinned_mesh: Maya skinned mesh
+        :param joint: Maya joint object
+        :param joint_influence: 0-1 float value
+        """
+        print("Flood weight paint")
 
-    :return: skin_cluster_node_list - list of skinCluster nodes with connection to rig
-    """
-    skin_cluster_node_list = shape_object.listConnections(type='skinCluster')
-    return skin_cluster_node_list
+        shape_node = cls.__get_shape_node(skinned_mesh)
+        skin_cluster = cls.__get_skin_cluster_nodes(shape_node)
 
+        if len(skin_cluster) == 0:
+            _append_to_user_output_log(f"{skinned_mesh} is not a rigged mesh")
+            return
 
+        skin_cluster = skin_cluster[0]
 
-def set_vertex_weight_paint_influence_from_joint(selected_vertex, joint_influence, joint):
-    """
-    Sets the rig influence on the vertex(es) from the joint to a given value. Does a single skinPercent call for
-    performance.
+        # doing a single skinPercent call is optimal and expected
+        try:
+            pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, joint_influence))
 
-    :param selected_vertex: List of vertex maya objects
-    :param joint_influence: Float value between 0-1
-    :param joint: Joint object
-    :return: is_success bool
-    """
-    print("Set vertex influence")
+        except RuntimeError as error_print:
+            _append_to_user_output_log(f"Error in attempting to apply weight paint: {error_print}")
 
-
-    # A selected vertex will have name format [shapeNode].vtx[i]
-
-    vertex_list = [vertex for vertex in selected_vertex if '.vtx' in str(vertex)]
-
-    if not vertex_list:
-        print("No vertex were selected")
-        # TODO: error printout
         return
 
-    single_vertex = vertex_list[0]
-    skinned_mesh_name = single_vertex.split('.vtx[')[0]
-    skinned_mesh = pm.ls(skinned_mesh_name)[0]
+    @classmethod
+    def __get_shape_node(cls, object_to_get):
+        """
+        Gets shape node depending on shape method
+        :param object_to_get:
+        """
+        if pm.objectType(object_to_get) == 'mesh':
+            return object_to_get
+        elif pm.objectType(object_to_get) == 'transform':
+            return object_to_get.getShape()
+        else:
+            # edge case of catching a hierarchy object without shape past the initial param validation
+            return []
 
-    shape_node = __get_shape_node(skinned_mesh)
-    skin_cluster = __get_skin_cluster_nodes(shape_node)
+    @classmethod
+    def __get_skin_cluster_nodes(cls, shape_object):
+        """
+        Gets skin cluster nodes
 
-    if len(skin_cluster) == 0:
-        print("Mesh not rigged")
-        # TODO: save error
-        return
+        :return: skin_cluster_node_list - list of skinCluster nodes with connection to rig
+        """
+        skin_cluster_node_list = shape_object.listConnections(type='skinCluster')
+        return skin_cluster_node_list
 
-    skin_cluster = skin_cluster[0]
+    @classmethod
+    def set_vertex_weight_paint_influence_from_joint(cls, selected_vertex, joint_influence, joint):
+        """
+        Sets the rig influence on the vertex(es) from the joint to a given value. Does a single skinPercent call for
+        performance.
 
-    # TODO: catch error for non-rig
-    # doing a single skinPercent call is optimal and expected
-    try:
-        pm.skinPercent(skin_cluster, vertex_list, transformValue=(joint, joint_influence))
-    except RuntimeError as error_print:
-        print(f"Error in attempting to apply weight paint: {error_print}")
-        # TODO: catch error for non-matching rig
-    return True
+        :param selected_vertex: List of vertex maya objects
+        :param joint_influence: Float value between 0-1
+        :param joint: Joint object
+        :return: is_success bool
+        """
+        print("Set vertex influence")
 
-def check_is_user_selected_a_valid_joint(user_selected_object):
+        # A selected vertex will have name format [shapeNode].vtx[i]
 
-    if len(user_selected_object) != 1:
-        # Multiple or zero objects selected
-        return False
+        vertex_list = [vertex for vertex in selected_vertex if '.vtx' in str(vertex)]
 
+        if not vertex_list:
+            _append_to_user_output_log("No vertex were selected")
+            return
 
-    if pm.objectType(user_selected_object) != 'joint':
-        # Object is not a joint object
-        return False
+        single_vertex = vertex_list[0]
+        skinned_mesh_name = single_vertex.split('.vtx[')[0]
+        skinned_mesh = pm.ls(skinned_mesh_name)[0]
 
-    return True
+        shape_node = cls.__get_shape_node(skinned_mesh)
+        skin_cluster = cls.__get_skin_cluster_nodes(shape_node)
 
-def check_is_user_selected_a_valid_mesh(user_selected_object):
+        if len(skin_cluster) == 0:
+            _append_to_user_output_log(f"{skinned_mesh} is not a rigged mesh")
+            return
 
-    if len(user_selected_object) != 1:
-        # Multiple or zero objects selected
-        return False
+        skin_cluster = skin_cluster[0]
 
+        # doing a single skinPercent call is optimal and expected
+        try:
+            pm.skinPercent(skin_cluster, vertex_list, transformValue=(joint, joint_influence))
+        except RuntimeError as error_print:
+            _append_to_user_output_log(f"Error in attempting to apply weight paint: {error_print}")
 
-    if pm.objectType(user_selected_object) != 'mesh' and pm.objectType(user_selected_object) != 'transform':
-        # Object is not a mesh/shape object
-        return False
+        return True
 
-    return True
+    @classmethod
+    def check_is_user_selected_a_valid_joint(cls, user_selected_object):
 
-def check_is_user_selected_valid_vertex_list(user_selected_list):
+        if len(user_selected_object) != 1:
+            # Multiple or zero objects selected
+            return False
 
-    if len(user_selected_list) == 0:
+        if pm.objectType(user_selected_object) != 'joint':
+            # Object is not a joint object
+            return False
 
-        # Zero objects selected
-        return False
+        return True
 
+    @classmethod
+    def check_is_user_selected_a_valid_mesh(cls, user_selected_object):
 
-    invalid_list = [vertex for vertex in user_selected_list if '.vtx' not in str(vertex)]
+        if len(user_selected_object) != 1:
+            # Multiple or zero objects selected
+            return False
 
-    if invalid_list:
-        # Non-vertex selected
-        return False
+        if pm.objectType(user_selected_object) != 'mesh' and pm.objectType(user_selected_object) != 'transform':
+            # Object is not a mesh/shape object
+            return False
 
-    single_vertex = user_selected_list[0]
-    skinned_mesh_name = single_vertex.split('.vtx[')[0]
+        return True
 
-    invalid_list = [vertex for vertex in user_selected_list if skinned_mesh_name not in str(vertex)]
+    @classmethod
+    def check_is_user_selected_valid_vertex_list(cls, user_selected_list):
 
-    if invalid_list:
-        # Vertex from multiple different shapes selected
-        return False
+        if len(user_selected_list) == 0:
+            # Zero objects selected
+            return False
 
-    return True
+        invalid_list = [vertex for vertex in user_selected_list if '.vtx' not in str(vertex)]
+
+        if invalid_list:
+            # Non-vertex selected
+            return False
+
+        single_vertex = user_selected_list[0]
+        skinned_mesh_name = single_vertex.split('.vtx[')[0]
+
+        invalid_list = [vertex for vertex in user_selected_list if skinned_mesh_name not in str(vertex)]
+
+        if invalid_list:
+            # Vertex from multiple different shapes selected
+            return False
+
+        return True
