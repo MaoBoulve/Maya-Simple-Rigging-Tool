@@ -13,8 +13,6 @@ from rigging_system_commands import Output
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 
-# TODO: UNDO ACTION
-
 def create_control_shape_on_joint(joint):
     print("Create ctl")
 
@@ -43,7 +41,7 @@ def create_control_shape_on_joint(joint):
 
 def create_rig_base(rig_type):
     print("Create rig base")
-    # todo LATER: create rig base??
+    # todo: create rig base
 
 def _append_to_user_output_log(new_entry):
 
