@@ -7,7 +7,6 @@
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
 import pymel.core as pm
-from rigging_system_commands import Output
 
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
@@ -44,7 +43,7 @@ def create_rig_base(rig_type):
     # todo: create rig base
 
 def _append_to_user_output_log(new_entry):
-
+    from rigging_system_commands import Output
     Output.append_to_output_queue(new_entry, "")
     return
 

@@ -10,7 +10,7 @@
 Command module for handling metadata data
 """
 
-import rigging_tasks
+from rigging_tasks import WeightPainting
 import pymel.core as pm
 
 from rigging_network_nodes import OutputQueueLog, WeightPaintingMetadataNode
@@ -34,7 +34,7 @@ class Output:
 
         return
 
-class WeightPainting:
+class WeightPaintingCommands:
 
     @classmethod
     def set_weight_paint_joint(cls, new_joint):
@@ -43,7 +43,7 @@ class WeightPainting:
         :return: is_success bool - set was success
         """
 
-        is_valid = rigging_tasks.WeightPainting.check_is_user_selected_a_valid_joint(new_joint)
+        is_valid = WeightPainting.check_is_user_selected_a_valid_joint(new_joint)
 
         if is_valid:
             WeightPaintingMetadataNode.set_new_weight_paint_joint(new_joint[0])
@@ -57,7 +57,7 @@ class WeightPainting:
         :param new_mesh: maya selected joint
         :return: is_success - set was success
         """
-        is_valid = rigging_tasks.WeightPainting.check_is_user_selected_a_valid_mesh(new_mesh)
+        is_valid = WeightPainting.check_is_user_selected_a_valid_mesh(new_mesh)
 
         if is_valid:
             WeightPaintingMetadataNode.set_new_mesh(new_mesh[0])
@@ -70,7 +70,7 @@ class WeightPainting:
         :param vertex_list: maya selected joint
         :return: is_success - set was success
         """
-        is_valid = rigging_tasks.WeightPainting.check_is_user_selected_valid_vertex_list(vertex_list)
+        is_valid = WeightPainting.check_is_user_selected_valid_vertex_list(vertex_list)
 
         if is_valid:
             WeightPaintingMetadataNode.set_new_vertex_list(vertex_list)
@@ -82,7 +82,7 @@ class WeightPainting:
         mesh = pm.ls(WeightPaintingMetadataNode.get_mesh())[0]
         joint = pm.ls(WeightPaintingMetadataNode.get_weight_paint_joint())[0]
 
-        rigging_tasks.WeightPainting.set_mesh_weight_paint_influence_from_joint(skinned_mesh=mesh, joint_influence=weight_paint_value, joint=joint)
+        WeightPainting.set_mesh_weight_paint_influence_from_joint(skinned_mesh=mesh, joint_influence=weight_paint_value, joint=joint)
         return
 
     @classmethod
@@ -90,7 +90,7 @@ class WeightPainting:
         vertex = pm.ls(WeightPaintingMetadataNode.get_vertex_list())
         joint = pm.ls(WeightPaintingMetadataNode.get_weight_paint_joint())[0]
 
-        rigging_tasks.WeightPainting.set_vertex_weight_paint_influence_from_joint(selected_vertex=vertex, joint_influence=weight_paint_value, joint=joint)
+        WeightPainting.set_vertex_weight_paint_influence_from_joint(selected_vertex=vertex, joint_influence=weight_paint_value, joint=joint)
         return
 
     @classmethod

@@ -10,7 +10,7 @@ from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
 from qt_utils import QtMayaUtils
-from rigging_system_commands import WeightPainting, Output
+from rigging_system_commands import WeightPaintingCommands, Output
 
 class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
     """
@@ -295,7 +295,7 @@ class _DataHandler:
     def update_weight_paint_joint(cls):
 
         new_joint = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = WeightPainting.set_weight_paint_joint(new_joint)
+        is_success = WeightPaintingCommands.set_weight_paint_joint(new_joint)
 
         if is_success:
             new_joint_name = str(new_joint[0])
@@ -311,7 +311,7 @@ class _DataHandler:
 
 
         new_mesh = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = WeightPainting.set_mesh_to_paint(new_mesh)
+        is_success = WeightPaintingCommands.set_mesh_to_paint(new_mesh)
 
         if is_success:
             new_mesh_name = str(new_mesh[0])
@@ -327,7 +327,7 @@ class _DataHandler:
     def update_vertex_to_paint(cls):
 
         new_vertex_list = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = WeightPainting.set_vertex_list_to_paint(new_vertex_list)
+        is_success = WeightPaintingCommands.set_vertex_list_to_paint(new_vertex_list)
 
         if is_success:
             vertex_count = QtMayaUtils.count_distinct_vertex_from_sliced_list(new_vertex_list)
@@ -341,31 +341,31 @@ class _DataHandler:
 
     @classmethod
     def apply_mesh_weight_paint(cls, weight_paint_value):
-        WeightPainting.apply_mesh_weight_paint(weight_paint_value)
+        WeightPaintingCommands.apply_mesh_weight_paint(weight_paint_value)
         return
 
     @classmethod
     def apply_vertex_weight_paint(cls, weight_paint_value):
-        WeightPainting.apply_vertex_weight_paint(weight_paint_value)
+        WeightPaintingCommands.apply_vertex_weight_paint(weight_paint_value)
         return
 
     @classmethod
     def select_current_joint(cls):
-        object_to_select = WeightPainting.get_current_joint()
+        object_to_select = WeightPaintingCommands.get_current_joint()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
 
     @classmethod
     def select_current_mesh(cls):
-        object_to_select = WeightPainting.get_current_mesh()
+        object_to_select = WeightPaintingCommands.get_current_mesh()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
 
     @classmethod
     def select_current_vertex(cls):
-        object_to_select = WeightPainting.get_current_vertex_list()
+        object_to_select = WeightPaintingCommands.get_current_vertex_list()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
@@ -374,8 +374,8 @@ class _DataHandler:
     def check_is_mesh_paint_parameters_set(cls):
         is_valid = True
 
-        joint = WeightPainting.get_current_joint()
-        mesh = WeightPainting.get_current_mesh()
+        joint = WeightPaintingCommands.get_current_joint()
+        mesh = WeightPaintingCommands.get_current_mesh()
 
         if joint is None or mesh is None:
             is_valid = False
@@ -386,8 +386,8 @@ class _DataHandler:
     def check_is_vertex_paint_parameters_set(cls):
         is_valid = True
 
-        joint = WeightPainting.get_current_joint()
-        vertex = WeightPainting.get_current_vertex_list()
+        joint = WeightPaintingCommands.get_current_joint()
+        vertex = WeightPaintingCommands.get_current_vertex_list()
 
         if joint is None or vertex is None:
             is_valid = False
@@ -407,9 +407,9 @@ class _DataHandler:
 
     @classmethod
     def get_current_weight_paint_settings(cls):
-        joint = str(WeightPainting.get_current_joint())
-        mesh = str(WeightPainting.get_current_mesh())
+        joint = str(WeightPaintingCommands.get_current_joint())
+        mesh = str(WeightPaintingCommands.get_current_mesh())
 
-        vertex = WeightPainting.get_current_vertex_list()
+        vertex = WeightPaintingCommands.get_current_vertex_list()
         vertex = QtMayaUtils.count_distinct_vertex_from_sliced_list(vertex)
         return joint, mesh, vertex

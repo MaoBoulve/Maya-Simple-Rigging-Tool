@@ -30,18 +30,17 @@ Following code block should be copied into the Maya script editor and run.
     
     
     import sys
-    
-    
+
     # rename [User directory name] to user account Maya files is installed under
     sys.path.append('/Users/[User directory name]/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Metadata')
     sys.path.append('/Users/[User directory name]/Documents/maya/scripts/Maya-Simple-Rigging-Tool/QtInterface')
-    sys.path.append('/Users/[User directory name]/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Validator')
+    sys.path.append('/Users/[User directory name]/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Rigging')
     
-    import validator_commands
+    # initial import
+    import rigging_user_commands
     
-    # Change 'run()' to 'validate()' to run validation without changing settings
-    # Change to 'assets()' to open the asset window
-    # Change to 'validate_json()' to run validation using settings from json file
-    validator_commands.run()
+    # Main tool
+    rigging_user_commands.open_simple_rig_tool()
+
 
 '''
