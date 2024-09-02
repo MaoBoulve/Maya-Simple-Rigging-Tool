@@ -94,14 +94,14 @@ class WeightPaintingCommands:
         return
 
     @classmethod
-    def get_current_joint(cls):
+    def get_current_weight_paint_joint(cls):
         joint = pm.ls(WeightPaintingMetadataNode.get_weight_paint_joint())
         if joint:
             return joint[0]
         return None
 
     @classmethod
-    def get_current_mesh(cls):
+    def get_current_weight_paint_mesh(cls):
         mesh = pm.ls(WeightPaintingMetadataNode.get_mesh())
 
         if mesh:
@@ -109,7 +109,7 @@ class WeightPaintingCommands:
         return None
 
     @classmethod
-    def get_current_vertex_list(cls):
+    def get_current_weight_paint_vertex_list(cls):
         return pm.ls(WeightPaintingMetadataNode.get_vertex_list())
 
 

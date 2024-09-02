@@ -9,8 +9,8 @@
 from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
-from qt_utils import QtMayaUtils
-from rigging_system_commands import WeightPaintingCommands, Output
+import qt_maya_utils as QtMayaUtils
+from qt_rigging_system_controls import WeightPaintingCommands, Output
 
 class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
     """
@@ -351,21 +351,21 @@ class _DataHandler:
 
     @classmethod
     def select_current_joint(cls):
-        object_to_select = WeightPaintingCommands.get_current_joint()
+        object_to_select = WeightPaintingCommands.get_current_weight_paint_joint()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
 
     @classmethod
     def select_current_mesh(cls):
-        object_to_select = WeightPaintingCommands.get_current_mesh()
+        object_to_select = WeightPaintingCommands.get_current_weight_paint_mesh()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
 
     @classmethod
     def select_current_vertex(cls):
-        object_to_select = WeightPaintingCommands.get_current_vertex_list()
+        object_to_select = WeightPaintingCommands.get_current_weight_paint_vertex_list()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
@@ -374,8 +374,8 @@ class _DataHandler:
     def check_is_mesh_paint_parameters_set(cls):
         is_valid = True
 
-        joint = WeightPaintingCommands.get_current_joint()
-        mesh = WeightPaintingCommands.get_current_mesh()
+        joint = WeightPaintingCommands.get_current_weight_paint_joint()
+        mesh = WeightPaintingCommands.get_current_weight_paint_mesh()
 
         if joint is None or mesh is None:
             is_valid = False
@@ -386,8 +386,8 @@ class _DataHandler:
     def check_is_vertex_paint_parameters_set(cls):
         is_valid = True
 
-        joint = WeightPaintingCommands.get_current_joint()
-        vertex = WeightPaintingCommands.get_current_vertex_list()
+        joint = WeightPaintingCommands.get_current_weight_paint_joint()
+        vertex = WeightPaintingCommands.get_current_weight_paint_vertex_list()
 
         if joint is None or vertex is None:
             is_valid = False
@@ -407,9 +407,9 @@ class _DataHandler:
 
     @classmethod
     def get_current_weight_paint_settings(cls):
-        joint = str(WeightPaintingCommands.get_current_joint())
-        mesh = str(WeightPaintingCommands.get_current_mesh())
+        joint = str(WeightPaintingCommands.get_current_weight_paint_joint())
+        mesh = str(WeightPaintingCommands.get_current_weight_paint_mesh())
 
-        vertex = WeightPaintingCommands.get_current_vertex_list()
+        vertex = WeightPaintingCommands.get_current_weight_paint_vertex_list()
         vertex = QtMayaUtils.count_distinct_vertex_from_sliced_list(vertex)
         return joint, mesh, vertex

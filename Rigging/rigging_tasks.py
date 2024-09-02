@@ -43,8 +43,9 @@ def create_rig_base(rig_type):
     # todo: create rig base
 
 def _append_to_user_output_log(new_entry):
-    from rigging_system_commands import Output
-    Output.append_to_output_queue(new_entry, "")
+    from rigging_network_nodes import OutputQueueLog
+    OutputQueueLog.add_to_output_log(new_entry, "")
+
     return
 
 class WeightPainting:
