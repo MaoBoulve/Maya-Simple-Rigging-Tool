@@ -656,7 +656,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="list_output"/>
+    <widget class="QListWidget" name="list_output">
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="line_2">

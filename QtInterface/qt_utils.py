@@ -13,7 +13,6 @@ Qt Helper module for Maya and Metadata functionality, isolating dependency on py
 """
 
 import pymel.core as pm
-from validator_network_nodes import ValidationGroups
 
 
 class QtMayaUtils:
@@ -109,59 +108,3 @@ class QtMayaUtils:
                 full_vertex_list.append(list_entry)
 
         return len(full_vertex_list)
-
-
-class QtMetadataUtils:
-    """
-    Util class for metadata node calls
-    """
-
-    @staticmethod
-    def get_validator_group_names():
-        """
-        Gets string list of validator group nodes from metadata module
-        """
-        names = ValidationGroups.get_name_of_all_group_maya_nodes()
-        return names
-
-    @staticmethod
-    def get_validation_group_assets(group_name='anim_validation'):
-        """
-        Gets pymel maya objects from group name.
-        Names should be validated from get_validator_group_names output.
-        """
-        assets = ValidationGroups.get_group_assets(group_name)
-        return assets
-
-    @staticmethod
-    def connect_selected_maya_objects_to_validation_group(group_name='anim_validation'):
-        """
-        Attempts to connect user selected maya objects to validation group.
-        :param group_name: Maya node name of validation group
-        :return [is_success] - success boolean
-        """
-        is_success = ValidationGroups.connect_selected_maya_objects_to_validation_group(group_name)
-
-        return is_success
-
-    @staticmethod
-    def connect_objects_to_validation_group(asset_list, group_name='anim_validation'):
-        """
-        Connects asset list from validation group.
-        :param asset_list: Pymel asset list
-        :param group_name: Maya node name of validation group
-        :return [is_success] - success boolean
-        """
-        is_success = ValidationGroups.connect_assets_to_validation_group(asset_list, group_name)
-        return is_success
-
-    @staticmethod
-    def disconnect_objects_from_validation_group(asset_list, group_name='anim_validation'):
-        """
-        Disconnects asset list from validation group.
-        :param asset_list: Pymel asset list
-        :param group_name: Maya node name of validation group
-        :return [is_success] - success boolean
-        """
-        is_success = ValidationGroups.disconnect_assets_from_validation_group(asset_list, group_name)
-        return is_success

@@ -8,20 +8,17 @@ sys.path.append('/Users/ceeja/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Ri
 
 # initial import
 import rigging_tasks
-import rigging_commands
+import rigging_user_commands
 import simple_rigging_tool_widget
 import importlib
-import qt_maya_widget_base
 import rigging_network_nodes
 
 # reimport
+importlib.reload(rigging_user_commands)
 importlib.reload(rigging_tasks)
-importlib.reload(rigging_commands)
 importlib.reload(simple_rigging_tool_widget)
-importlib.reload(qt_maya_widget_base)
 importlib.reload(rigging_network_nodes)
 
 # main testing
 
-rig_widget = simple_rigging_tool_widget.SimpleRigToolWindowWidget()
-rig_widget.show()
+rigging_user_commands.open_simple_rig_tool()

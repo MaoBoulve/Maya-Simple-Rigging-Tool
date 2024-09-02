@@ -1,11 +1,16 @@
+# Asset Validation Tool
+# Copyright (C) 2024 Chris 'Nel' Mendoza
+
+# This file is part of Simple Rigging Tool
+# Simple Rigging Tool is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+# Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
+
 import pymel.core as pm
-import rigging_commands
+from rigging_system_commands import Output
 
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
-
-def test():
-    print("Test")
 
 
 # TODO: UNDO ACTION
@@ -42,7 +47,7 @@ def create_rig_base(rig_type):
 
 def _append_to_user_output_log(new_entry):
 
-    rigging_commands.BackEndCommands.Output.append_to_output_queue(new_entry, "")
+    Output.append_to_output_queue(new_entry, "")
     return
 
 class WeightPainting:
@@ -62,7 +67,7 @@ class WeightPainting:
         skin_cluster = cls.__get_skin_cluster_nodes(shape_node)
 
         if len(skin_cluster) == 0:
-            _append_to_user_output_log(f"{skinned_mesh} is not a rigged mesh")
+            _append_to_user_output_log(f"-{skinned_mesh} is not a rigged mesh")
             return
 
         skin_cluster = skin_cluster[0]
@@ -70,9 +75,10 @@ class WeightPainting:
         # doing a single skinPercent call is optimal and expected
         try:
             pm.skinPercent(skin_cluster, skinned_mesh.vtx, transformValue=(joint, joint_influence))
+            _append_to_user_output_log(f"-Mesh weight paint for {skinned_mesh} successful")
 
         except RuntimeError as error_print:
-            _append_to_user_output_log(f"Error in attempting to apply weight paint: {error_print}")
+            _append_to_user_output_log(f"-Error in attempting to apply weight paint: {error_print}")
 
         return
 
@@ -119,7 +125,7 @@ class WeightPainting:
         vertex_list = [vertex for vertex in selected_vertex if '.vtx' in str(vertex)]
 
         if not vertex_list:
-            _append_to_user_output_log("No vertex were selected")
+            _append_to_user_output_log("-No vertex were selected")
             return
 
         single_vertex = vertex_list[0]
@@ -130,7 +136,7 @@ class WeightPainting:
         skin_cluster = cls.__get_skin_cluster_nodes(shape_node)
 
         if len(skin_cluster) == 0:
-            _append_to_user_output_log(f"{skinned_mesh} is not a rigged mesh")
+            _append_to_user_output_log(f"-{skinned_mesh} is not a rigged mesh")
             return
 
         skin_cluster = skin_cluster[0]
@@ -138,8 +144,10 @@ class WeightPainting:
         # doing a single skinPercent call is optimal and expected
         try:
             pm.skinPercent(skin_cluster, vertex_list, transformValue=(joint, joint_influence))
+            _append_to_user_output_log(f"-Vertex weight paint for {skinned_mesh} vertex successful")
+
         except RuntimeError as error_print:
-            _append_to_user_output_log(f"Error in attempting to apply weight paint: {error_print}")
+            _append_to_user_output_log(f"-Error in attempting to apply weight paint: {error_print}")
 
         return True
 

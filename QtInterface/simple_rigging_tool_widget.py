@@ -9,8 +9,8 @@
 from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
-from qt_utils import QtMayaUtils, QtMetadataUtils
-from rigging_commands import BackEndCommands
+from qt_utils import QtMayaUtils
+from rigging_system_commands import WeightPainting, Output
 
 class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
     """
@@ -290,17 +290,18 @@ class _DataHandler:
     Data handler class for connections and dependencies on Rigging module
     """
 
+
     @classmethod
     def update_weight_paint_joint(cls):
 
         new_joint = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = BackEndCommands.WeightPainting.set_weight_paint_joint(new_joint)
+        is_success = WeightPainting.set_weight_paint_joint(new_joint)
 
         if is_success:
             new_joint_name = str(new_joint[0])
 
         else:
-            _DataHandler.append_to_output_queue("Selected object is not a Joint")
+            _DataHandler.append_to_output_queue("-Selected object is not a Joint")
             new_joint_name = ""
 
         return is_success, new_joint_name
@@ -310,14 +311,14 @@ class _DataHandler:
 
 
         new_mesh = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = BackEndCommands.WeightPainting.set_mesh_to_paint(new_mesh)
+        is_success = WeightPainting.set_mesh_to_paint(new_mesh)
 
         if is_success:
             new_mesh_name = str(new_mesh[0])
 
         else:
 
-            _DataHandler.append_to_output_queue("Selected object is not a Mesh")
+            _DataHandler.append_to_output_queue("-Selected object is not a Mesh")
             new_mesh_name = ""
 
         return is_success, new_mesh_name
@@ -326,13 +327,13 @@ class _DataHandler:
     def update_vertex_to_paint(cls):
 
         new_vertex_list = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = BackEndCommands.WeightPainting.set_vertex_list_to_paint(new_vertex_list)
+        is_success = WeightPainting.set_vertex_list_to_paint(new_vertex_list)
 
         if is_success:
             vertex_count = QtMayaUtils.count_distinct_vertex_from_sliced_list(new_vertex_list)
 
         else:
-            _DataHandler.append_to_output_queue("Selected object is not a Vertex or multiple vertex from a single mesh")
+            _DataHandler.append_to_output_queue("-Selected object is not a Vertex or multiple vertex from a single mesh")
 
             vertex_count = -1
 
@@ -340,31 +341,31 @@ class _DataHandler:
 
     @classmethod
     def apply_mesh_weight_paint(cls, weight_paint_value):
-        BackEndCommands.WeightPainting.apply_mesh_weight_paint(weight_paint_value)
+        WeightPainting.apply_mesh_weight_paint(weight_paint_value)
         return
 
     @classmethod
     def apply_vertex_weight_paint(cls, weight_paint_value):
-        BackEndCommands.WeightPainting.apply_vertex_weight_paint(weight_paint_value)
+        WeightPainting.apply_vertex_weight_paint(weight_paint_value)
         return
 
     @classmethod
     def select_current_joint(cls):
-        object_to_select = BackEndCommands.WeightPainting.get_current_joint()
+        object_to_select = WeightPainting.get_current_joint()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
 
     @classmethod
     def select_current_mesh(cls):
-        object_to_select = BackEndCommands.WeightPainting.get_current_mesh()
+        object_to_select = WeightPainting.get_current_mesh()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
 
     @classmethod
     def select_current_vertex(cls):
-        object_to_select = BackEndCommands.WeightPainting.get_current_vertex_list()
+        object_to_select = WeightPainting.get_current_vertex_list()
         QtMayaUtils.select_maya_object(object_to_select)
 
         return
@@ -373,8 +374,8 @@ class _DataHandler:
     def check_is_mesh_paint_parameters_set(cls):
         is_valid = True
 
-        joint = BackEndCommands.WeightPainting.get_current_joint()
-        mesh = BackEndCommands.WeightPainting.get_current_mesh()
+        joint = WeightPainting.get_current_joint()
+        mesh = WeightPainting.get_current_mesh()
 
         if joint is None or mesh is None:
             is_valid = False
@@ -385,8 +386,8 @@ class _DataHandler:
     def check_is_vertex_paint_parameters_set(cls):
         is_valid = True
 
-        joint = BackEndCommands.WeightPainting.get_current_joint()
-        vertex = BackEndCommands.WeightPainting.get_current_vertex_list()
+        joint = WeightPainting.get_current_joint()
+        vertex = WeightPainting.get_current_vertex_list()
 
         if joint is None or vertex is None:
             is_valid = False
@@ -395,20 +396,20 @@ class _DataHandler:
 
     @classmethod
     def retrieve_current_output_queue(cls):
-        output_queue = BackEndCommands.Output.get_current_output_queue()
-        BackEndCommands.Output.clear_current_output_queue()
+        output_queue = Output.get_current_output_queue()
+        Output.clear_current_output_queue()
         return output_queue
 
     @classmethod
     def append_to_output_queue(cls, entry):
-        BackEndCommands.Output.append_to_output_queue(entry, "")
+        Output.append_to_output_queue(entry, "")
         return
 
     @classmethod
     def get_current_weight_paint_settings(cls):
-        joint = str(BackEndCommands.WeightPainting.get_current_joint())
-        mesh = str(BackEndCommands.WeightPainting.get_current_mesh())
+        joint = str(WeightPainting.get_current_joint())
+        mesh = str(WeightPainting.get_current_mesh())
 
-        vertex = BackEndCommands.WeightPainting.get_current_vertex_list()
+        vertex = WeightPainting.get_current_vertex_list()
         vertex = QtMayaUtils.count_distinct_vertex_from_sliced_list(vertex)
         return joint, mesh, vertex
