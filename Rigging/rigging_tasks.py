@@ -11,32 +11,11 @@ import pymel.core as pm
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
+def TDD_test_task():
+    shape = pm.ls(sl=True)[0]
+    joint = pm.ls('joint1')
 
-def create_control_shape_on_joint(joint):
-    print("Create ctl")
-
-    # parse joint name
-    joint_name = str(joint)
-
-    # get controller name from joint name, replacing _jnt with _ctl
-    controller_name = joint_name.replace('_jnt', '')
-    controller_name = controller_name + '_ctl'
-
-    # orient controller to joint translation
-    controller_center = [pm.getAttr(joint_name + '.translateX'),
-           pm.getAttr(joint_name + '.translateY'),
-           pm.getAttr(joint_name + '.translateZ')]
-    controller_normal = [0, 0, 0]
-    shape_radius = 3.0
-
-    # create nurbs circle
-    nurbs_circle = pm.circle(name=controller_name, radius=shape_radius,
-                             center=controller_center, normal=controller_normal)
-
-    # center pivot of created circle
-    pm.xform(nurbs_circle, centerPivots=True)
-
-    return nurbs_circle
+    RigControl.mirror_control_shapes(shape)
 
 def create_rig_base(rig_type):
     print("Create rig base")
@@ -47,9 +26,141 @@ def _append_to_user_output_log(new_entry):
     OutputQueueLog.add_to_output_log(new_entry, "")
 
     return
+class RigControl:
+    """
+    Rig setup class for creating nurbs shapes to control joints
+    """
+
+    @classmethod
+    def create_control_shape_on_joint(cls, joint):
+
+        # parse joint name
+        joint_name = str(joint)
+
+        # get controller name from joint name, replacing _jnt with _ctl
+        controller_name = joint_name.replace('_jnt', '')
+        controller_name = controller_name + '_ctl'
+
+        # orient controller to joint translation
+        controller_center = [pm.getAttr(joint_name + '.translateX'),
+                             pm.getAttr(joint_name + '.translateY'),
+                             pm.getAttr(joint_name + '.translateZ')]
+        controller_normal = [0, 0, 0]
+        shape_radius = 3.0
+
+        # create nurbs circle
+        nurbs_circle = pm.circle(name=controller_name, radius=shape_radius,
+                                 center=controller_center, normal=controller_normal)
+
+        # center pivot of created circle
+        pm.xform(nurbs_circle, centerPivots=True)
+
+        return nurbs_circle
+
+    @classmethod
+    def set_control_shape_uniform_scale(cls, control_shape, new_scale):
+
+        # parse control name
+        control_shape_name = str(control_shape)
+        control_scale = control_shape_name + '.scale'
+
+        # set scale uniformly
+        pm.setAttr(control_scale,new_scale, new_scale, new_scale)
+
+        return
+
+    @classmethod
+    def set_control_shape_rotation(cls, control_shape, new_rotate_tuple=(0,0,0)):
+
+        # parse control name
+        control_shape_name = str(control_shape)
+        control_rotate = control_shape_name + '.rotate'
+
+        # set scale uniformly
+        pm.setAttr(control_rotate, new_rotate_tuple)
+
+    @classmethod
+    def parent_constrain_control_to_joint(cls, control_shape, joint,
+                                          translateX=True, translateY=True, translateZ=True,
+                                          rotateX=True, rotateY=True, rotateZ=True,
+                                          scaleX=True, scaleY=True, scaleZ=True,
+                                          maintain_offset=True):
+        skip_translate = []
+        skip_rotate = []
+        skip_scale = []
+
+        if not translateX:
+            skip_translate.append("x")
+        if not translateY:
+            skip_translate.append("y")
+        if not translateZ:
+            skip_translate.append("z")
+
+        if not rotateX:
+            skip_rotate.append("x")
+        if not rotateY:
+            skip_rotate.append("y")
+        if not rotateZ:
+            skip_rotate.append("z")
+
+        if not scaleX:
+            skip_scale.append("x")
+        if not scaleY:
+            skip_scale.append("y")
+        if not scaleZ:
+            skip_scale.append("z")
+
+        # Parent constraint ONLY constrains translate and rotate
+        pm.parentConstraint(control_shape, joint, st=skip_translate, sr=skip_rotate, maintainOffset=maintain_offset)
+        pm.scaleConstraint(control_shape, joint, sk=skip_scale, maintainOffset=maintain_offset)
+        return
+
+    @classmethod
+    def point_constrain_control_to_joint(cls, control_shape, joint):
+        pm.pointConstraint(control_shape, joint)
+
+    @classmethod
+    def pole_vector_constrain_control_to_joint(cls, control_shape, joint):
+        pm.poleVectorConstraint(control_shape, joint)
+
+
+    @classmethod
+    def mirror_control_shapes(cls, root_control_shape, left_prefix='left_', right_prefix='right_', left_to_right=True,
+                              xMirror=True, yMirror=False, zMirror=False):
+
+        # Get all nurbs curves from hierarchy
+        control_hierarchy = list()
+        control_hierarchy.append(root_control_shape)
+        control_hierarchy.append(pm.listRelatives(root_control_shape, allDescendents=True, shapes=True))
+        control_hierarchy = pm.ls(control_hierarchy, type='nurbsCurve')
+        print(control_hierarchy)
+
+        if left_to_right:
+            search_prefix = left_prefix
+            replace_prefix = right_prefix
+        else:
+            search_prefix = right_prefix
+            replace_prefix = left_prefix
+
+        control_to_mirror = [control for control in control_hierarchy if search_prefix in str(control)]
+
+        print(control_to_mirror)
+
+        #TODO: save parent of shapes to mirror
+        # TODO: group shapes to mirror
+        # TODO: duplicate grouped shapes
+        # TODO: scale new group by mirror axis
+        # TODO: reparent old group
+        # TODO: parent new group
+        print()
+
+
+    # TODO: mirror left to right/right to left and rename
 
 class WeightPainting:
-
+    """
+    Rig setup class for weight painting a skinned mesh
+    """
     @classmethod
     def set_mesh_weight_paint_influence_from_joint(cls, skinned_mesh, joint_influence, joint):
         """

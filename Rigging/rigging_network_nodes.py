@@ -75,7 +75,7 @@ def _check_and_convert_null_get_input(get_value):
 
 class WeightPaintingMetadataNode(DependentNode):
     """
-    Output Log public class for handling validation result display
+    Weight painting metadata node. Stores current settings for joint/mesh/vertex in weight painting tab
     """
     dependent_node = Core
     maya_node_name = 'weight_painting'
@@ -147,6 +147,21 @@ class WeightPaintingMetadataNode(DependentNode):
         vertex_list = _parse_attribute_string_to_list(long_string)
 
         return vertex_list
+
+class RigControllersMetadataNode(DependentNode):
+    """
+    Output Log public class for handling validation result display
+    """
+    dependent_node = Core
+    maya_node_name = 'rig_control'
+
+    def __init__(self, parent=None, node_name=maya_node_name, node=None, namespace=""):
+        super().__init__(parent, node_name, node, namespace,
+                         joint=('', 'string'),
+                         mesh=('', 'string'),
+                         vertex=('', 'string'))
+        return
+
 
 class OutputQueueLog(DependentNode):
     """
