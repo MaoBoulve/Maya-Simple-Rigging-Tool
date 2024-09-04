@@ -133,7 +133,6 @@ class RigControl:
         control_hierarchy.append(root_control_shape)
         control_hierarchy.append(pm.listRelatives(root_control_shape, allDescendents=True, shapes=True))
         control_hierarchy = pm.ls(control_hierarchy, type='nurbsCurve')
-        print(control_hierarchy)
 
         if left_to_right:
             search_prefix = left_prefix
