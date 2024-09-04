@@ -85,24 +85,33 @@ class RigControl:
                                           rotateX=True, rotateY=True, rotateZ=True,
                                           scaleX=True, scaleY=True, scaleZ=True,
                                           maintain_offset=True):
+        skip_rotate, skip_scale, skip_translate = cls._make_vectors_for_axis_to_skip(rotateX, rotateY, rotateZ,
+                                                                                     scaleX,scaleY,scaleZ,
+                                                                                     translateX,translateY, translateZ)
+
+        # Parent constraint ONLY constrains translate and rotate
+        pm.parentConstraint(control_shape, joint, st=skip_translate, sr=skip_rotate, maintainOffset=maintain_offset)
+        pm.scaleConstraint(control_shape, joint, sk=skip_scale, maintainOffset=maintain_offset)
+        return
+
+    @classmethod
+    def _make_vectors_for_axis_to_skip(cls, rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ,
+                                       translateX, translateY, translateZ):
         skip_translate = []
         skip_rotate = []
         skip_scale = []
-
         if not translateX:
             skip_translate.append("x")
         if not translateY:
             skip_translate.append("y")
         if not translateZ:
             skip_translate.append("z")
-
         if not rotateX:
             skip_rotate.append("x")
         if not rotateY:
             skip_rotate.append("y")
         if not rotateZ:
             skip_rotate.append("z")
-
         if not scaleX:
             skip_scale.append("x")
         if not scaleY:
@@ -110,10 +119,8 @@ class RigControl:
         if not scaleZ:
             skip_scale.append("z")
 
-        # Parent constraint ONLY constrains translate and rotate
-        pm.parentConstraint(control_shape, joint, st=skip_translate, sr=skip_rotate, maintainOffset=maintain_offset)
-        pm.scaleConstraint(control_shape, joint, sk=skip_scale, maintainOffset=maintain_offset)
-        return
+
+        return skip_rotate, skip_scale, skip_translate
 
     @classmethod
     def point_constrain_control_to_joint(cls, control_shape, joint):
@@ -128,11 +135,12 @@ class RigControl:
     def mirror_control_shapes(cls, root_control_shape, left_prefix='left_', right_prefix='right_', left_to_right=True,
                               xMirror=True, yMirror=False, zMirror=False):
 
-        # Get all nurbs curves from hierarchy
-        control_hierarchy = list()
-        control_hierarchy.append(root_control_shape)
-        control_hierarchy.append(pm.listRelatives(root_control_shape, allDescendents=True, shapes=True))
-        control_hierarchy = pm.ls(control_hierarchy, type='nurbsCurve')
+        # Get all nurbs curves transforms from hierarchy
+
+        hierarchy_nurbs = pm.listRelatives(root_control_shape, allDescendents=True, type='nurbsCurve')
+
+        control_hierarchy = pm.listRelatives(hierarchy_nurbs, parent=True)
+        control_hierarchy = pm.ls(control_hierarchy, type='transform')
 
         if left_to_right:
             search_prefix = left_prefix
@@ -142,17 +150,62 @@ class RigControl:
             replace_prefix = left_prefix
 
         control_to_mirror = [control for control in control_hierarchy if search_prefix in str(control)]
+        control_parents = pm.listRelatives(control_to_mirror, parent=True, shapes=True)
 
-        print(control_to_mirror)
+        initial_control_group = pm.group(control_to_mirror, world=True)
+        pm.xform(initial_control_group, pivots=[0,0,0], worldSpace=True)
 
-        #TODO: save parent of shapes to mirror
-        # TODO: group shapes to mirror
-        # TODO: duplicate grouped shapes
-        # TODO: scale new group by mirror axis
-        # TODO: reparent old group
-        # TODO: parent new group
-        print()
+        # create duplicate of the controls
+        duplicate_controls_group = pm.duplicate(initial_control_group)
 
+        # create scale vector
+        x_scale, y_scale, z_scale = cls._make_axis_scale_values(xMirror, yMirror, zMirror)
+
+        # mirror the new group
+        mirror_group_scale = str(duplicate_controls_group[0]) + '.scale'
+        pm.setAttr(mirror_group_scale, x_scale, y_scale, z_scale)
+
+        hierarchy_nurbs = pm.listRelatives(duplicate_controls_group, allDescendents=True, type='nurbsCurve')
+        mirrored_controls = pm.listRelatives(hierarchy_nurbs, parent=True)
+
+        # renames mirrored group
+        for single_control in mirrored_controls:
+            old_name = str(single_control)
+            new_name = old_name.replace(search_prefix, replace_prefix)
+            pm.rename(single_control, new_name)
+
+        control_parent_iterations = len(control_parents)
+
+        for i in range(control_parent_iterations):
+            parent_target = control_parents[i]
+
+            # parent old control to prior parent
+            pm.parent(control_to_mirror[i], parent_target)
+
+            # check if parent should be to a new control
+            if search_prefix in str(parent_target):
+                parent_target = parent_target.replace(search_prefix, replace_prefix)
+
+            # parent new control
+            pm.parent(mirrored_controls[i], parent_target)
+
+        return
+
+    @classmethod
+    def _make_axis_scale_values(cls, xMirror, yMirror, zMirror):
+        if xMirror:
+            x_scale = -1
+        else:
+            x_scale = 1
+        if yMirror:
+            y_scale = -1
+        else:
+            y_scale = 1
+        if zMirror:
+            z_scale = -1
+        else:
+            z_scale = 1
+        return x_scale, y_scale, z_scale
 
     # TODO: mirror left to right/right to left and rename
 
