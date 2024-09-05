@@ -89,7 +89,7 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def __get_weight_painting_maya_node(cls):
-        maya_get = pm.ls('weight_painting')
+        maya_get = pm.ls(cls.maya_node_name)
 
         if maya_get:
             return maya_get[0]
@@ -169,17 +169,70 @@ class WeightPaintingMetadataNode(DependentNode):
 
 class RigControllersMetadataNode(DependentNode):
     """
-    Output Log public class for handling validation result display
+    Rig Control metadata node
     """
     dependent_node = Core
     maya_node_name = 'rig_control'
 
     def __init__(self, parent=None, node_name=maya_node_name, node=None, namespace=""):
         super().__init__(parent, node_name, node, namespace,
-                         joint=('', 'string'),
-                         mesh=('', 'string'),
-                         vertex=('', 'string'))
+                         target_control_shape=('', 'string'),
+                         control_group_to_mirror=('', 'string'))
         return
+
+    @classmethod
+    def __get_weight_painting_maya_node(cls):
+        maya_get = pm.ls(cls.maya_node_name)
+
+        if maya_get:
+            return maya_get[0]
+        else:
+            return None
+
+    @classmethod
+    def __get_rig_control_metadata_instance(cls):
+        maya_node = cls.__get_weight_painting_maya_node()
+        metadata_instance = RigControllersMetadataNode(node=maya_node)
+
+        return metadata_instance
+
+    @classmethod
+    def set_target_control_shape(cls, control_shape):
+        class_instance = cls.__get_rig_control_metadata_instance()
+        RigControllersMetadataNode.set(class_instance, 'target_control_shape', control_shape)
+
+        return
+
+    @classmethod
+    def get_target_control_shape(cls):
+        class_instance = cls.__get_rig_control_metadata_instance()
+        target_control_shape = RigControllersMetadataNode.get(class_instance, 'target_control_shape')
+
+        target_control_shape = pm.ls(target_control_shape)
+
+        if target_control_shape:
+            return target_control_shape[0]
+        else:
+            return None
+
+    @classmethod
+    def set_control_group_to_mirror(cls, control_group):
+        class_instance = cls.__get_rig_control_metadata_instance()
+        RigControllersMetadataNode.set(class_instance, 'control_group_to_mirror', control_group)
+
+        return
+
+    @classmethod
+    def get_control_group_to_mirror(cls):
+        class_instance = cls.__get_rig_control_metadata_instance()
+        control_group_to_mirror = RigControllersMetadataNode.get(class_instance, 'control_group_to_mirror')
+
+        control_group_to_mirror = pm.ls(control_group_to_mirror)
+
+        if control_group_to_mirror:
+            return control_group_to_mirror[0]
+        else:
+            return None
 
 
 class OutputLog(DependentNode):
