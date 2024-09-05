@@ -13,13 +13,9 @@ import output_system_commands
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 def TDD_test_task():
-    shape = pm.ls(sl=True)[0]
 
-    RigControl.mirror_control_shapes(shape)
+    RigSetup.create_unity_humanoid_rig_base()
 
-def create_rig_base(rig_type):
-    print("Create rig base")
-    # todo: create rig base
 
 def _append_to_user_output_log(new_entry):
 
@@ -27,20 +23,59 @@ def _append_to_user_output_log(new_entry):
 
     return
 
+class RigSetup:
+
+    @classmethod
+    def create_unreal_humanoid_rig_base(cls):
+        print("Unreal rig base")
+
+    @classmethod
+    def create_unity_humanoid_rig_base(cls, joint_suffix="_jnt"):
+        # based on https://docs.unity3d.com/Manual/class-Avatar.html
+        print("Unity")
+
+        # root
+        root_joint = pm.joint(position=[0,0,0], name='root'+joint_suffix)
+
+        # hip - over spine, upper leg
+        hip_joint = pm.joint(root_joint, position=[0,100,.5], name='hip'+joint_suffix)
+
+        # spine - over spine 1
+        # spine 1/chest - over spine 2
+        # spine 2/upper chest - over neck, shoulder
+
+        # shoulder - over arm
+        # arm/upper arm - over forearm
+        # forearm/lower arm - over hand
+        # hand - CHAIN END
+
+        # neck - over head
+        # head - over head top
+        # head top - CHAIN END
+
+        # upper leg - over leg
+        # leg - over foot
+        # foot - over toe base
+        # toe base - over toe end
+
+        return
+
+    @classmethod
+    def create_simple_rig_base(cls):
+        print("Simple")
 class RigControl:
     """
     Rig setup class for creating nurbs shapes to control joints
     """
 
     @classmethod
-    def create_control_shape_on_joint(cls, joint):
+    def create_control_shape_on_joint(cls, joint, joint_suffix='_jnt', controller_suffix='_ctl'):
 
         # parse joint name
         joint_name = str(joint)
 
         # get controller name from joint name, replacing _jnt with _ctl
-        controller_name = joint_name.replace('_jnt', '')
-        controller_name = controller_name + '_ctl'
+        controller_name = joint_name.replace(joint_suffix, controller_suffix)
 
         # orient controller to joint translation
         controller_center = [pm.getAttr(joint_name + '.translateX'),

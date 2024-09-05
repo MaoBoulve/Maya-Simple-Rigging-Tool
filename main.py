@@ -20,5 +20,4 @@ importlib.reload(rigging_network_nodes)
 
 # main testing
 
-#rigging_tasks.TDD_test_task()
-rigging_user_commands.open_simple_rig_tool()
+rigging_tasks.TDD_test_task()
