@@ -113,7 +113,15 @@ class WeightPaintingMetadataNode(DependentNode):
     @classmethod
     def get_weight_paint_joint(cls):
         class_instance = cls.__get_weight_painting_metadata_instance()
-        return WeightPaintingMetadataNode.get(class_instance, 'joint')
+        joint_name = WeightPaintingMetadataNode.get(class_instance, 'joint')
+
+        joint_object = pm.ls(joint_name)
+
+        if joint_object:
+            return joint_object[0]
+        else:
+            return None
+
 
     @classmethod
     def set_new_mesh(cls, mesh_name):
@@ -125,7 +133,15 @@ class WeightPaintingMetadataNode(DependentNode):
     @classmethod
     def get_mesh(cls):
         class_instance = cls.__get_weight_painting_metadata_instance()
-        return WeightPaintingMetadataNode.get(class_instance, 'mesh')
+        mesh_name = WeightPaintingMetadataNode.get(class_instance, 'mesh')
+
+        mesh_object = pm.ls(mesh_name)
+
+        if mesh_object:
+            return mesh_object[0]
+        else:
+            return None
+
 
     @classmethod
     def set_new_vertex_list(cls, vertex_list):
@@ -146,6 +162,9 @@ class WeightPaintingMetadataNode(DependentNode):
         long_string = WeightPaintingMetadataNode.get(class_instance, 'vertex')
         vertex_list = _parse_attribute_string_to_list(long_string)
 
+        # convert from string to maya object
+        vertex_list = pm.ls(vertex_list)
+
         return vertex_list
 
 class RigControllersMetadataNode(DependentNode):
@@ -163,7 +182,7 @@ class RigControllersMetadataNode(DependentNode):
         return
 
 
-class OutputQueueLog(DependentNode):
+class OutputLog(DependentNode):
     """
     Output Log public class for handling validation result display
     """
@@ -184,18 +203,18 @@ class OutputQueueLog(DependentNode):
 
     @classmethod
     def clear_output_log(cls):
-        output_maya_node = OutputQueueLog.__get_output_maya_node()
-        output_node = OutputQueueLog(node=output_maya_node)
+        output_maya_node = OutputLog.__get_output_maya_node()
+        output_node = OutputLog(node=output_maya_node)
 
-        OutputQueueLog.set(output_node, 'output_log', '')
-        OutputQueueLog.set(output_node, 'target_object_name', '')
+        OutputLog.set(output_node, 'output_log', '')
+        OutputLog.set(output_node, 'target_object_name', '')
 
         return
 
     @classmethod
     def add_to_output_log(cls, log_entry, target_object_name):
-        output_maya_node = OutputQueueLog.__get_output_maya_node()
-        output_node = OutputQueueLog(node=output_maya_node)
+        output_maya_node = OutputLog.__get_output_maya_node()
+        output_node = OutputLog(node=output_maya_node)
 
         cls.__append_to_output_node_attribute_strings(output_node, log_entry, attribute='output_log')
         cls.__append_to_output_node_attribute_strings(output_node, target_object_name, attribute='target_object_name')
@@ -213,7 +232,7 @@ class OutputQueueLog(DependentNode):
 
     @staticmethod
     def __append_to_output_node_attribute_strings(output_node, new_string, attribute='output_log'):
-        current_string = OutputQueueLog.get(output_node, attribute)
+        current_string = OutputLog.get(output_node, attribute)
 
         if current_string == '':
             new_attrib_string = new_string
@@ -221,7 +240,7 @@ class OutputQueueLog(DependentNode):
         else:
             new_attrib_string = current_string + "`" + new_string
 
-        OutputQueueLog.set(output_node, attribute, new_attrib_string)
+        OutputLog.set(output_node, attribute, new_attrib_string)
         return
 
     @classmethod
@@ -241,18 +260,18 @@ class OutputQueueLog(DependentNode):
         else:
             output_maya_node = None
 
-        output_node = OutputQueueLog(node=output_maya_node)
+        output_node = OutputLog(node=output_maya_node)
 
-        output_log = OutputQueueLog.__get_output_node_attribute_value_as_list(output_node, attribute='output_log')
-        target_object_name = OutputQueueLog.__get_output_node_attribute_value_as_list(output_node,
+        output_log = OutputLog.__get_output_node_attribute_value_as_list(output_node, attribute='output_log')
+        target_object_name = OutputLog.__get_output_node_attribute_value_as_list(output_node,
                                                                                  attribute='target_object_name')
 
         return output_log, target_object_name
 
     @staticmethod
     def __get_output_node_attribute_value_as_list(output_node, attribute='output_log'):
-        long_string = OutputQueueLog.get(output_node, attribute)
-        value_as_list = OutputQueueLog.__parse_string_to_list(long_string)
+        long_string = OutputLog.get(output_node, attribute)
+        value_as_list = OutputLog.__parse_string_to_list(long_string)
 
         return value_as_list
 

@@ -7,13 +7,13 @@
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
 import pymel.core as pm
+import output_system_commands
 
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 def TDD_test_task():
     shape = pm.ls(sl=True)[0]
-    joint = pm.ls('joint1')
 
     RigControl.mirror_control_shapes(shape)
 
@@ -22,10 +22,11 @@ def create_rig_base(rig_type):
     # todo: create rig base
 
 def _append_to_user_output_log(new_entry):
-    from rigging_network_nodes import OutputQueueLog
-    OutputQueueLog.add_to_output_log(new_entry, "")
+
+    output_system_commands.append_to_output_log(new_entry, "")
 
     return
+
 class RigControl:
     """
     Rig setup class for creating nurbs shapes to control joints
@@ -313,7 +314,9 @@ class WeightPainting:
         return True
 
     @classmethod
-    def check_is_user_selected_a_valid_joint(cls, user_selected_object):
+    def check_is_object_a_valid_joint(cls, user_selected_object):
+
+        user_selected_object= pm.ls(sl=True)
 
         if len(user_selected_object) != 1:
             # Multiple or zero objects selected
@@ -326,7 +329,7 @@ class WeightPainting:
         return True
 
     @classmethod
-    def check_is_user_selected_a_valid_mesh(cls, user_selected_object):
+    def check_is_object_a_valid_mesh(cls, user_selected_object):
 
         if len(user_selected_object) != 1:
             # Multiple or zero objects selected
@@ -339,7 +342,7 @@ class WeightPainting:
         return True
 
     @classmethod
-    def check_is_user_selected_valid_vertex_list(cls, user_selected_list):
+    def check_is_object_valid_vertex_list(cls, user_selected_list):
 
         if len(user_selected_list) == 0:
             # Zero objects selected

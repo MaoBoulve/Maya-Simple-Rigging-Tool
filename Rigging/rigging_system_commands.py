@@ -11,28 +11,12 @@ Command module for handling metadata data
 """
 
 from rigging_tasks import WeightPainting
-import pymel.core as pm
+from rigging_network_nodes import WeightPaintingMetadataNode
+import output_system_commands
 
-from rigging_network_nodes import OutputQueueLog, WeightPaintingMetadataNode
 
 
-class Output:
-    @classmethod
-    def append_to_output_queue(cls, log_entry, log_target_object):
-        OutputQueueLog.add_to_output_log(log_entry, log_target_object)
-        return
 
-    @classmethod
-    def get_current_output_queue(cls):
-        output = OutputQueueLog.get_output_log()
-
-        return output
-
-    @classmethod
-    def clear_current_output_queue(cls):
-        OutputQueueLog.clear_output_log()
-
-        return
 
 class WeightPaintingCommands:
 
@@ -43,11 +27,13 @@ class WeightPaintingCommands:
         :return: is_success bool - set was success
         """
 
-        is_valid = WeightPainting.check_is_user_selected_a_valid_joint(new_joint)
+        is_valid = WeightPainting.check_is_object_a_valid_joint(new_joint)
 
         if is_valid:
-            WeightPaintingMetadataNode.set_new_weight_paint_joint(new_joint[0])
+            WeightPaintingMetadataNode.set_new_weight_paint_joint(new_joint)
 
+        else:
+            output_system_commands.append_to_output_log("-Object is not a Mesh")
 
         return is_valid
 
@@ -57,10 +43,13 @@ class WeightPaintingCommands:
         :param new_mesh: maya selected joint
         :return: is_success - set was success
         """
-        is_valid = WeightPainting.check_is_user_selected_a_valid_mesh(new_mesh)
+        is_valid = WeightPainting.check_is_object_a_valid_mesh(new_mesh)
 
         if is_valid:
-            WeightPaintingMetadataNode.set_new_mesh(new_mesh[0])
+            WeightPaintingMetadataNode.set_new_mesh(new_mesh)
+
+        else:
+            output_system_commands.append_to_output_log("-Object is not a Joint")
 
         return is_valid
 
@@ -70,47 +59,45 @@ class WeightPaintingCommands:
         :param vertex_list: maya selected joint
         :return: is_success - set was success
         """
-        is_valid = WeightPainting.check_is_user_selected_valid_vertex_list(vertex_list)
+        is_valid = WeightPainting.check_is_object_valid_vertex_list(vertex_list)
 
         if is_valid:
             WeightPaintingMetadataNode.set_new_vertex_list(vertex_list)
 
+        else:
+            output_system_commands.append_to_output_log("-Object is not Vertex/Vertices from a single mesh")
+
         return is_valid
 
     @classmethod
-    def apply_mesh_weight_paint(cls, weight_paint_value):
-        mesh = pm.ls(WeightPaintingMetadataNode.get_mesh())[0]
-        joint = pm.ls(WeightPaintingMetadataNode.get_weight_paint_joint())[0]
+    def apply_joint_weight_paint_on_metadata_mesh(cls, weight_paint_value):
+        mesh = cls.get_current_weight_paint_mesh()
+        joint = cls.get_current_weight_paint_joint()
 
         WeightPainting.set_mesh_weight_paint_influence_from_joint(skinned_mesh=mesh, joint_influence=weight_paint_value, joint=joint)
         return
 
     @classmethod
-    def apply_vertex_weight_paint(cls, weight_paint_value):
-        vertex = pm.ls(WeightPaintingMetadataNode.get_vertex_list())
-        joint = pm.ls(WeightPaintingMetadataNode.get_weight_paint_joint())[0]
+    def apply_joint_weight_paint_on_metadata_vertex(cls, weight_paint_value):
+        vertex = cls.get_current_weight_paint_vertex_list()
+        joint = cls.get_current_weight_paint_joint()
 
         WeightPainting.set_vertex_weight_paint_influence_from_joint(selected_vertex=vertex, joint_influence=weight_paint_value, joint=joint)
         return
 
     @classmethod
     def get_current_weight_paint_joint(cls):
-        joint = pm.ls(WeightPaintingMetadataNode.get_weight_paint_joint())
-        if joint:
-            return joint[0]
-        return None
+        joint = WeightPaintingMetadataNode.get_weight_paint_joint()
+
+        return joint
+
 
     @classmethod
     def get_current_weight_paint_mesh(cls):
-        mesh = pm.ls(WeightPaintingMetadataNode.get_mesh())
+        mesh = WeightPaintingMetadataNode.get_mesh()
+        return mesh
 
-        if mesh:
-            return mesh[0]
-        return None
 
     @classmethod
     def get_current_weight_paint_vertex_list(cls):
-        return pm.ls(WeightPaintingMetadataNode.get_vertex_list())
-
-
-    
+        return WeightPaintingMetadataNode.get_vertex_list()
