@@ -6,16 +6,19 @@
 # Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
+
 import pymel.core as pm
+import maya.mel as mel
+
 import output_system_commands
+import rigging_json_file_parser
 
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 def TDD_test_task():
 
-    RigSetup.create_unity_humanoid_rig_base()
-
+    RigSetup.save_rig_base_to_json_file(pm.ls(sl=True)[0])
 
 def _append_to_user_output_log(new_entry):
 
@@ -23,59 +26,186 @@ def _append_to_user_output_log(new_entry):
 
     return
 
+
 class RigSetup:
 
     @classmethod
-    def create_unreal_humanoid_rig_base(cls):
-        print("Unreal rig base")
+    def create_rig_base_from_json_file(cls, joint_list_name="unreal", joint_notation="_jnt", end_notation=True):
 
-    @classmethod
-    def create_unity_humanoid_rig_base(cls, joint_suffix="_jnt"):
-        # based on https://docs.unity3d.com/Manual/class-Avatar.html
-        print("Unity")
+        try:
+            joint_list = rigging_json_file_parser.RiggingJSONDataGetter.get_joint_list(joint_list_name)
 
-        # root
-        root_joint = pm.joint(position=[0,0,0], name='root'+joint_suffix)
+            cls._create_joint_chain_from_joint_entry_list(joint_list, joint_notation=joint_notation,
+                                                          notation_at_end=end_notation)
 
-        # hip - over spine, upper leg
-        hip_joint = pm.joint(root_joint, position=[0,100,.5], name='hip'+joint_suffix)
+        except KeyError:
+            print(f"Joint list not in JSON file: {joint_list_name}")
+            _append_to_user_output_log(f"Joint list not in JSON file: {joint_list_name}")
 
-        # spine - over spine 1
-        # spine 1/chest - over spine 2
-        # spine 2/upper chest - over neck, shoulder
-
-        # shoulder - over arm
-        # arm/upper arm - over forearm
-        # forearm/lower arm - over hand
-        # hand - CHAIN END
-
-        # neck - over head
-        # head - over head top
-        # head top - CHAIN END
-
-        # upper leg - over leg
-        # leg - over foot
-        # foot - over toe base
-        # toe base - over toe end
 
         return
 
     @classmethod
-    def create_simple_rig_base(cls):
-        print("Simple")
+    def _create_joint_chain_from_joint_entry_list(cls, joint_entry_list, joint_notation, notation_at_end=True):
+
+        if notation_at_end:
+            joint_suffix = joint_notation
+            joint_prefix = ''
+        else:
+            joint_suffix = ''
+            joint_prefix = joint_notation
+
+        pm.select(clear=True) # clears selection to avoid joint chain starting from a selected object
+
+        joint_list = []
+        for joint_entry in joint_entry_list:
+
+            joint_position = joint_entry[1]
+            joint_name = joint_prefix + joint_entry[0] + joint_suffix
+
+            if joint_entry[2] == 'NONE':
+                parent_joint = None
+            else:
+                parent_joint = joint_prefix + joint_entry[2] + joint_suffix
+
+            if pm.ls(joint_name):
+                print(f"Object already exists: {joint_name}")
+                _append_to_user_output_log(f"Object already exists: {joint_name}")
+
+                pm.delete(joint_list)
+                joint_list.clear()
+                break
+
+            new_joint = cls._create_joint(joint_name, joint_position, parent_joint)
+            joint_list.append(new_joint)
+
+        cls._orient_joint_list(joint_list)
+
+        return
+
+    @staticmethod
+    def _create_joint(name='joint', position=(0,0,0), parent_joint=None):
+        """
+        Creates and returns a joint with given parameters
+        :param name: joint name
+        :param position: x,y,z coordinate
+        :param parent_joint: parent joint maya object OR joint name
+        :return: joint - joint object
+        """
+
+        if parent_joint:
+            joint = pm.joint(position=position, name=name)
+            pm.parent(joint, parent_joint)
+        else:
+            joint = pm.joint(position=position, name=name)
+
+        return joint
+
+    @staticmethod
+    def _orient_joint_list(joint_list):
+
+        for joint in joint_list:
+            # orient joints
+            # edit flag not working in pymel so doing direct MEL command
+            mel.eval(f'joint -e  -oj xyz -secondaryAxisOrient xup -ch -zso {str(joint)}')
+
+        return
+
+    @classmethod
+    def mirror_joint_chain(cls, root_joint, mirrorYZ=True, mirrorXY=False, mirrorXZ=False,
+                           search_name = 'left_', replace_name = 'right_'):
+
+        joint_list = cls._get_joint_hierarchy(root_joint)
+
+        # looking for the first joints in side joint chains
+        joints_to_mirror = [joint for joint in joint_list if search_name in str(joint)]
+        joints_to_mirror = cls._search_for_first_joint_in_joints_to_mirror(joints_to_mirror, search_name)
+
+
+
+        for joint in joints_to_mirror:
+            pm.mirrorJoint(joint, searchReplace=(search_name,replace_name), mirrorYZ=mirrorYZ,
+                           mirrorXY=mirrorXY, mirrorXZ=mirrorXZ)
+
+
+        pm.select(clear=True)
+
+        return
+
+    @staticmethod
+    def _get_joint_hierarchy(root_joint):
+        joint_list = list()
+        joint_list.append(root_joint)
+        joint_list.append(pm.listRelatives(allDescendents=True))
+        joint_list = pm.ls(joint_list, type='joint')
+
+        return joint_list
+
+    @classmethod
+    def _search_for_first_joint_in_joints_to_mirror(cls, joint_list, search_name):
+        """
+        Recursively searches for the first joint in a chain with the corresponding search_name
+        :param joint_list: list of maya joints
+        :param search_name: string, search criteria
+        :return:
+        """
+        joints_to_remove = list()
+
+        for joint in joint_list:
+            parent = pm.listRelatives(joint, parent=True)[0]
+
+            if search_name in str(parent):
+                joints_to_remove.append(joint)
+
+        joint_list = [joint for joint in joint_list if joint not in joints_to_remove]
+
+        if joints_to_remove:
+            joint_list = cls._search_for_first_joint_in_joints_to_mirror(joint_list, search_name)
+
+        return joint_list
+
+    @classmethod
+    def save_rig_base_to_json_file(cls, root_joint, joint_list_name="new_base"):
+        joint_list = cls._get_joint_hierarchy(root_joint)
+
+        joint_entry_list = list()
+        for joint in joint_list:
+            joint_name = str(joint)
+
+            joint_parent = pm.listRelatives(joint, parent=True)
+            joint_parent = pm.ls(joint_parent, type='joint')
+
+            if joint_parent:
+                # gets world position by temporarily parenting to world
+                joint_parent = str(joint_parent[0])
+                pm.parent(joint, world=True)
+                joint_position = list(pm.getAttr(joint_name + '.translate'))
+                pm.parent(joint, joint_parent)
+            else:
+                joint_parent = 'NONE'
+                joint_position = list(pm.getAttr(joint_name + '.translate'))
+
+            joint_entry = [joint_name, joint_position, joint_parent]
+            joint_entry_list.append(joint_entry)
+
+        print(joint_entry_list)
+        pm.select(clear=True)
+        # TODO: save to json
+        return
+
 class RigControl:
     """
     Rig setup class for creating nurbs shapes to control joints
     """
 
     @classmethod
-    def create_control_shape_on_joint(cls, joint, joint_suffix='_jnt', controller_suffix='_ctl'):
+    def create_control_shape_on_joint(cls, joint, joint_notation='_jnt', controller_notation='_ctl'):
 
         # parse joint name
         joint_name = str(joint)
 
         # get controller name from joint name, replacing _jnt with _ctl
-        controller_name = joint_name.replace(joint_suffix, controller_suffix)
+        controller_name = joint_name.replace(joint_notation, controller_notation)
 
         # orient controller to joint translation
         controller_center = [pm.getAttr(joint_name + '.translateX'),
@@ -168,7 +298,7 @@ class RigControl:
 
 
     @classmethod
-    def mirror_control_shapes(cls, root_control_shape, left_prefix='left_', right_prefix='right_', left_to_right=True,
+    def mirror_control_shapes(cls, root_control_shape, search_name='left_', replace_name='right_',
                               xMirror=True, yMirror=False, zMirror=False):
 
         # Get all nurbs curves transforms from hierarchy
@@ -178,14 +308,7 @@ class RigControl:
         control_hierarchy = pm.listRelatives(hierarchy_nurbs, parent=True)
         control_hierarchy = pm.ls(control_hierarchy, type='transform')
 
-        if left_to_right:
-            search_prefix = left_prefix
-            replace_prefix = right_prefix
-        else:
-            search_prefix = right_prefix
-            replace_prefix = left_prefix
-
-        control_to_mirror = [control for control in control_hierarchy if search_prefix in str(control)]
+        control_to_mirror = [control for control in control_hierarchy if search_name in str(control)]
         control_parents = pm.listRelatives(control_to_mirror, parent=True, shapes=True)
 
         initial_control_group = pm.group(control_to_mirror, world=True)
@@ -207,7 +330,7 @@ class RigControl:
         # renames mirrored group
         for single_control in mirrored_controls:
             old_name = str(single_control)
-            new_name = old_name.replace(search_prefix, replace_prefix)
+            new_name = old_name.replace(search_name, replace_name)
             pm.rename(single_control, new_name)
 
         control_parent_iterations = len(control_parents)
@@ -219,8 +342,8 @@ class RigControl:
             pm.parent(control_to_mirror[i], parent_target)
 
             # check if parent should be to a new control
-            if search_prefix in str(parent_target):
-                parent_target = parent_target.replace(search_prefix, replace_prefix)
+            if search_name in str(parent_target):
+                parent_target = parent_target.replace(search_name, replace_name)
 
             # parent new control
             pm.parent(mirrored_controls[i], parent_target)
@@ -243,7 +366,6 @@ class RigControl:
             z_scale = 1
         return x_scale, y_scale, z_scale
 
-    # TODO: mirror left to right/right to left and rename
 
 class WeightPainting:
     """
@@ -350,8 +472,6 @@ class WeightPainting:
 
     @classmethod
     def check_is_object_a_valid_joint(cls, user_selected_object):
-
-        user_selected_object= pm.ls(sl=True)
 
         if len(user_selected_object) != 1:
             # Multiple or zero objects selected
