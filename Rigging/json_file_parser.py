@@ -15,34 +15,8 @@ import json
 
 _module_file_path = __file__  # __file__ lists the full file path to the python file
 
-class RiggingJSONDataGetter:
-    __json_filename = "rigging_joint_bases.json"
 
-    """
-    Class for reading validation settings from json class, converting inputs to format usable by metadata system
-    
-    Assumes JSON file is in the Validator folder & is named validator_settings.json. Need to match parameter order
-    of each settings metadata node.
-    """
-
-    @classmethod
-    def get_joint_list(cls, list_name_query="list_name"):
-        """
-
-        """
-
-        json_data = _FileReader.get_json_data(cls.__json_filename)
-
-        joint_list = []
-
-        if json_data:
-            joint_list = list(json_data[list_name_query])
-
-        return joint_list
-
-
-
-class _FileReader:
+class FileReader:
     """
     Class for reading local files. Assumes file is the same, or nested within, the same directory as the python file.
     """
@@ -71,9 +45,38 @@ class _FileReader:
         :return: [json_data] - json nested dictionary
         """
 
-        json_file_path = _module_file_path.replace('rigging_json_file_parser.py', json_file_name)
+        json_file_path = _module_file_path.replace('json_file_parser.py', json_file_name)
 
         with open(json_file_path, 'r') as jsonfile:
             data = json.load(jsonfile)
 
         return data
+
+
+class FileWriter:
+    """
+    Class for writing to json files.
+    """
+
+    @classmethod
+    def write_json_value(cls, entry_key, entry_value, json_filename):
+        """
+        Overwrites json file with new value.
+        :param entry_key: string, dictionary key
+        :param entry_value: string, new value for entry_key
+        :param json_filename: string, local filename
+        """
+
+        json_file_path = _module_file_path.replace('json_file_parser.py', json_filename)
+
+        with open(json_file_path, 'r') as json_file:
+            # save data and set dict value to arg
+            data = json.load(json_file)
+            data[entry_key] = entry_value
+
+        with open(json_file_path, 'w') as json_file:
+            # write data, replacing whole data
+            json_file.seek(0)
+            json.dump(data, json_file, indent=4)
+
+        return

@@ -11,14 +11,16 @@ import pymel.core as pm
 import maya.mel as mel
 
 import output_system_commands
-import rigging_json_file_parser
+import rigging_json_parser
 
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
 def TDD_test_task():
-
-    RigSetup.save_rig_base_to_json_file(pm.ls(sl=True)[0])
+    print("TDD_test_task")
+    # RigSetup.save_rig_base_to_json_file(pm.ls(sl=True)[0])
+    Skeleton.create_rig_base_from_json_file("new_base", joint_notation="")
+    return
 
 def _append_to_user_output_log(new_entry):
 
@@ -27,19 +29,27 @@ def _append_to_user_output_log(new_entry):
     return
 
 
-class RigSetup:
+class Skeleton:
+    """
+    Rig class for handling joint creation
+    """
 
     @classmethod
     def create_rig_base_from_json_file(cls, joint_list_name="unreal", joint_notation="_jnt", end_notation=True):
+        """
+        Creates a joint chain based on saved json data.
+        :param joint_list_name: string, Name of list to retrieve from json file
+        :param joint_notation: string, string to append/prepend to joint for hierarchy clarity
+        :param end_notation: bool, whether to append/prepend notation
+        """
 
-        try:
-            joint_list = rigging_json_file_parser.RiggingJSONDataGetter.get_joint_list(joint_list_name)
+        try: # try-except catches when the json file was edited externally
+            joint_list = rigging_json_parser.RiggingJSONDataManagement.get_joint_list(joint_list_name)
 
             cls._create_joint_chain_from_joint_entry_list(joint_list, joint_notation=joint_notation,
                                                           notation_at_end=end_notation)
 
         except KeyError:
-            print(f"Joint list not in JSON file: {joint_list_name}")
             _append_to_user_output_log(f"Joint list not in JSON file: {joint_list_name}")
 
 
@@ -47,7 +57,14 @@ class RigSetup:
 
     @classmethod
     def _create_joint_chain_from_joint_entry_list(cls, joint_entry_list, joint_notation, notation_at_end=True):
+        """
+        Creates a joint chain from a list of joint entries. If joints already exist, stops and deletes prior joints.
+        :param joint_entry_list: list of entries with format [joint_name, [xyz position], joint_parent_name]
+        :param joint_notation: string, notation
+        :param notation_at_end: bool, notation is appended/prepended
+        """
 
+        # determine how notation should be handled
         if notation_at_end:
             joint_suffix = joint_notation
             joint_prefix = ''
@@ -55,55 +72,76 @@ class RigSetup:
             joint_suffix = ''
             joint_prefix = joint_notation
 
-        pm.select(clear=True) # clears selection to avoid joint chain starting from a selected object
-
         joint_list = []
+        parent_joint_name_list = []
+
+        # iterate on joint entries list
         for joint_entry in joint_entry_list:
 
-            joint_position = joint_entry[1]
+            pm.select(clear=True) # clears selection to avoid joint chain starting from a selected object
+
             joint_name = joint_prefix + joint_entry[0] + joint_suffix
+            joint_position = joint_entry[1]
 
             if joint_entry[2] == 'NONE':
                 parent_joint = None
             else:
                 parent_joint = joint_prefix + joint_entry[2] + joint_suffix
+            parent_joint_name_list.append(parent_joint)
 
             if pm.ls(joint_name):
-                print(f"Object already exists: {joint_name}")
                 _append_to_user_output_log(f"Object already exists: {joint_name}")
-
                 pm.delete(joint_list)
                 joint_list.clear()
                 break
 
-            new_joint = cls._create_joint(joint_name, joint_position, parent_joint)
+            new_joint = cls._create_joint(joint_name, joint_position)
             joint_list.append(new_joint)
 
+        cls._iterate_parent_joint(joint_list, parent_joint_name_list)
         cls._orient_joint_list(joint_list)
+        pm.select(clear=True)
 
         return
 
     @staticmethod
-    def _create_joint(name='joint', position=(0,0,0), parent_joint=None):
+    def _create_joint(name='joint', position=(0,0,0)):
         """
         Creates and returns a joint with given parameters
         :param name: joint name
         :param position: x,y,z coordinate
-        :param parent_joint: parent joint maya object OR joint name
         :return: joint - joint object
         """
 
-        if parent_joint:
-            joint = pm.joint(position=position, name=name)
-            pm.parent(joint, parent_joint)
-        else:
-            joint = pm.joint(position=position, name=name)
+
+        joint = pm.joint(position=position, name=name)
 
         return joint
 
     @staticmethod
-    def _orient_joint_list(joint_list):
+    def _iterate_parent_joint(joint_list, parent_joint_name_list):
+        """
+        Parents joints in list to corresponding joint name
+        :param joint_list: list of joints
+        :param parent_joint_name_list: list of string, joint parent names
+        :return:
+        """
 
+        iterations = len(joint_list)
+
+        for i in range(iterations):
+            if parent_joint_name_list[i]:
+                pm.parent(joint_list[i], parent_joint_name_list[i])
+
+        return
+
+
+    @staticmethod
+    def _orient_joint_list(joint_list):
+        """
+        Call mel command to orient all joints in list
+        :param joint_list: list of maya joints
+        """
         for joint in joint_list:
             # orient joints
             # edit flag not working in pymel so doing direct MEL command
@@ -114,7 +152,15 @@ class RigSetup:
     @classmethod
     def mirror_joint_chain(cls, root_joint, mirrorYZ=True, mirrorXY=False, mirrorXZ=False,
                            search_name = 'left_', replace_name = 'right_'):
-
+        """
+        Mirrors all joints with certain string in their name across a specified axis
+        :param root_joint: joint to search hierarchy for joints to mirror
+        :param mirrorYZ: bool, mirror axis
+        :param mirrorXY: bool, mirror axis
+        :param mirrorXZ: bool, mirror axis
+        :param search_name: string, joint string to search for
+        :param replace_name: string, joint string to replace
+        """
         joint_list = cls._get_joint_hierarchy(root_joint)
 
         # looking for the first joints in side joint chains
@@ -134,6 +180,11 @@ class RigSetup:
 
     @staticmethod
     def _get_joint_hierarchy(root_joint):
+        """
+        Gets all joints in hierarchy (including the root object passed in)
+        :param root_joint: maya object, assumed joint but will not throw error for other types
+        """
+
         joint_list = list()
         joint_list.append(root_joint)
         joint_list.append(pm.listRelatives(allDescendents=True))
@@ -166,6 +217,11 @@ class RigSetup:
 
     @classmethod
     def save_rig_base_to_json_file(cls, root_joint, joint_list_name="new_base"):
+        """
+        Saves rig hierarchy to json file.
+        :param root_joint: single maya object, assumed joint
+        :param joint_list_name: string, name to append to json file
+        """
         joint_list = cls._get_joint_hierarchy(root_joint)
 
         joint_entry_list = list()
@@ -188,9 +244,9 @@ class RigSetup:
             joint_entry = [joint_name, joint_position, joint_parent]
             joint_entry_list.append(joint_entry)
 
-        print(joint_entry_list)
+        rigging_json_parser.RiggingJSONDataManagement.add_joint_list_to_json_file(joint_entry_list, joint_list_name)
         pm.select(clear=True)
-        # TODO: save to json
+
         return
 
 class RigControl:
@@ -200,7 +256,12 @@ class RigControl:
 
     @classmethod
     def create_control_shape_on_joint(cls, joint, joint_notation='_jnt', controller_notation='_ctl'):
-
+        """
+        Creates a controller based on the passed in joint
+        :param joint: maya joint object
+        :param joint_notation: string, notation to find
+        :param controller_notation: string, notation to replace
+        """
         # parse joint name
         joint_name = str(joint)
 
@@ -225,6 +286,13 @@ class RigControl:
 
     @classmethod
     def set_control_shape_uniform_scale(cls, control_shape, new_scale):
+        """
+        Sets scale of control_shape via transform node
+        :param control_shape: shape
+        :param new_scale: float, new scale
+        """
+
+        # TODO: validate/get transform if given shape
 
         # parse control name
         control_shape_name = str(control_shape)
@@ -237,6 +305,13 @@ class RigControl:
 
     @classmethod
     def set_control_shape_rotation(cls, control_shape, new_rotate_tuple=(0,0,0)):
+        """
+        Sets new rotation of a control shape via transform node
+        :param control_shape: maya shape object
+        :param new_rotate_tuple: vector3, new rotation
+        """
+
+        # TODO: get transform if given shape node
 
         # parse control name
         control_shape_name = str(control_shape)
@@ -251,6 +326,23 @@ class RigControl:
                                           rotateX=True, rotateY=True, rotateZ=True,
                                           scaleX=True, scaleY=True, scaleZ=True,
                                           maintain_offset=True):
+        """
+        Apply parent constraint with bools for the 10 settings applicable
+        :param control_shape: shape object
+        :param joint: joint object
+        :param translateX: bool, constrain translate axis
+        :param translateY: bool, constrain translate axis
+        :param translateZ: bool, constrain translate axis
+        :param rotateX: bool, constrain rotate axis
+        :param rotateY: bool, constrain rotate axis
+        :param rotateZ: bool, constrain rotate axis
+        :param scaleX: bool, constrain scale axis
+        :param scaleY: bool, constrain scale axis
+        :param scaleZ: bool, constrain scale axis
+        :param maintain_offset: bool, move parented object or keep in place. False snaps child object to parent
+        """
+
+
         skip_rotate, skip_scale, skip_translate = cls._make_vectors_for_axis_to_skip(rotateX, rotateY, rotateZ,
                                                                                      scaleX,scaleY,scaleZ,
                                                                                      translateX,translateY, translateZ)
@@ -263,6 +355,10 @@ class RigControl:
     @classmethod
     def _make_vectors_for_axis_to_skip(cls, rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ,
                                        translateX, translateY, translateZ):
+        """
+        Creates vectors for parent and scale constraint axis to skip. Parameters are all bool for axis to skip
+        :return: skip_rotate, skip_scale, skip_translate
+        """
         skip_translate = []
         skip_rotate = []
         skip_scale = []
@@ -290,17 +386,37 @@ class RigControl:
 
     @classmethod
     def point_constrain_control_to_joint(cls, control_shape, joint):
+        """
+        Simple point constraint from shape to joint
+        :param control_shape: shape object
+        :param joint: joint object
+        """
         pm.pointConstraint(control_shape, joint)
+        return
 
     @classmethod
     def pole_vector_constrain_control_to_joint(cls, control_shape, joint):
-        pm.poleVectorConstraint(control_shape, joint)
+        """
+        Simple vector constraint from shape to joint
+        :param control_shape: shape object
+        :param joint: joint object
+        """
 
+        pm.poleVectorConstraint(control_shape, joint)
+        return
 
     @classmethod
     def mirror_control_shapes(cls, root_control_shape, search_name='left_', replace_name='right_',
                               xMirror=True, yMirror=False, zMirror=False):
-
+        """
+        Mirrors control objects across specified axis. Replaces search_name substring with replace_name substring
+        :param root_control_shape: root shape maya object
+        :param search_name: substring to determine shape should be mirrored
+        :param replace_name: substring to put on mirrored objects
+        :param xMirror: bool, mirror across X
+        :param yMirror: bool, mirror across Y
+        :param zMirror: bool, mirror across Z
+        """
         # Get all nurbs curves transforms from hierarchy
 
         hierarchy_nurbs = pm.listRelatives(root_control_shape, allDescendents=True, type='nurbsCurve')
@@ -352,6 +468,13 @@ class RigControl:
 
     @classmethod
     def _make_axis_scale_values(cls, xMirror, yMirror, zMirror):
+        """
+        Makes axis scale values for mirroring control shapes.
+        :param xMirror: bool
+        :param yMirror: bool
+        :param zMirror: bool
+        :return: x_scale - int, y_scale - int, z_scale - int
+        """
         if xMirror:
             x_scale = -1
         else:
@@ -371,6 +494,7 @@ class WeightPainting:
     """
     Rig setup class for weight painting a skinned mesh
     """
+
     @classmethod
     def set_mesh_weight_paint_influence_from_joint(cls, skinned_mesh, joint_influence, joint):
         """
@@ -380,7 +504,6 @@ class WeightPainting:
         :param joint: Maya joint object
         :param joint_influence: 0-1 float value
         """
-        print("Flood weight paint")
 
         shape_node = cls.__get_shape_node(skinned_mesh)
         skin_cluster = cls.__get_skin_cluster_nodes(shape_node)
@@ -437,7 +560,6 @@ class WeightPainting:
         :param joint: Joint object
         :return: is_success bool
         """
-        print("Set vertex influence")
 
         # A selected vertex will have name format [shapeNode].vtx[i]
 

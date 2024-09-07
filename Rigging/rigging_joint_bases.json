@@ -1,55 +1,364 @@
 {
     "unity_comment": "based on https://docs.unity3d.com/Manual/class-Avatar.html",
     "unity": [
-        ["hips", [0, 102, 0.5], "NONE"],
-        ["spine", [0, 108.32, 0.537], "hips"],
-        ["chest", [0, 114.907, 0.5], "spine"],
-        ["upper_chest", [0, 122.434, 0.457], "chest"],
-
-        ["neck", [0, 130.903, 0.409], "upper_chest"],
-        ["head", [0, 136.902, -0.75], "neck"],
-
-        ["left_shoulder", [3.415, 129.777, 0.398], "upper_chest"],
-        ["left_upper_arm", [10.247, 127.543, 0.376], "left_shoulder"],
-        ["left_lower_arm", [34.451, 127.543, 0.376], "left_upper_arm"],
-        ["left_hand", [56.046, 127.543, 0.376], "left_lower_arm"],
-
-        ["left_upper_leg", [6.62, 93.858, 0.122], "spine"],
-        ["left_lower_leg", [7.685, 57.688, -0.23], "left_upper_leg"],
-        ["left_foot", [6.62, 11.493, -2.493], "left_lower_leg"],
-        ["left_toes", [6.249, 1.112, 10.158], "left_foot"]
+        [
+            "hips",
+            [
+                0,
+                102,
+                0.5
+            ],
+            "NONE"
+        ],
+        [
+            "spine",
+            [
+                0,
+                108.32,
+                0.537
+            ],
+            "hips"
+        ],
+        [
+            "chest",
+            [
+                0,
+                114.907,
+                0.5
+            ],
+            "spine"
+        ],
+        [
+            "upper_chest",
+            [
+                0,
+                122.434,
+                0.457
+            ],
+            "chest"
+        ],
+        [
+            "neck",
+            [
+                0,
+                130.903,
+                0.409
+            ],
+            "upper_chest"
+        ],
+        [
+            "head",
+            [
+                0,
+                136.902,
+                -0.75
+            ],
+            "neck"
+        ],
+        [
+            "left_shoulder",
+            [
+                3.415,
+                129.777,
+                0.398
+            ],
+            "upper_chest"
+        ],
+        [
+            "left_upper_arm",
+            [
+                10.247,
+                127.543,
+                0.376
+            ],
+            "left_shoulder"
+        ],
+        [
+            "left_lower_arm",
+            [
+                34.451,
+                127.543,
+                0.376
+            ],
+            "left_upper_arm"
+        ],
+        [
+            "left_hand",
+            [
+                56.046,
+                127.543,
+                0.376
+            ],
+            "left_lower_arm"
+        ],
+        [
+            "left_upper_leg",
+            [
+                6.62,
+                93.858,
+                0.122
+            ],
+            "spine"
+        ],
+        [
+            "left_lower_leg",
+            [
+                7.685,
+                57.688,
+                -0.23
+            ],
+            "left_upper_leg"
+        ],
+        [
+            "left_foot",
+            [
+                6.62,
+                11.493,
+                -2.493
+            ],
+            "left_lower_leg"
+        ],
+        [
+            "left_toes",
+            [
+                6.249,
+                1.112,
+                10.158
+            ],
+            "left_foot"
+        ]
     ],
-
     "unreal_comment": "based on unreal template SK_mannequin",
     "unreal": [
-        ["root", [0, 0, 0], "NONE"],
-        ["pelvis", [0, 96.751, -1.056], "root"],
-        ["spine_01", [0, 107.556, -0.165], "pelvis"],
-        ["spine_02", [0, 126.763, -1.516], "spine_01"],
-        ["spine_03", [0, 140.03, -3.498], "spine_02"],
-
-        ["neck_01", [0, 156.421, -5.875], "spine_03"],
-        ["head", [0, 165.516, -3.978], "neck_01"],
-
-        ["left_clavicle", [3.782, 152.201, -2.76], "spine_03"],
-        ["left_upper_arm", [17.7, 149.53, -9.711], "left_clavicle"],
-        ["left_lower_arm", [37.265, 126.445, -11.911], "left_upper_arm"],
-        ["left_hand", [56.646, 111.68, -0.335], "left_lower_arm"],
-
-        ["left_thigh", [9.006, 95.3, -0.53], "pelvis"],
-        ["left_calf", [14.218, 53.067, -1.802], "left_thigh"],
-        ["left_foot", [17.076, 13.466, -8.074], "left_calf"],
-        ["left_ball", [17.909, 2.812, 8.355], "left_foot"]
+        [
+            "root",
+            [
+                0,
+                0,
+                0
+            ],
+            "NONE"
+        ],
+        [
+            "pelvis",
+            [
+                0,
+                96.751,
+                -1.056
+            ],
+            "root"
+        ],
+        [
+            "spine_01",
+            [
+                0,
+                107.556,
+                -0.165
+            ],
+            "pelvis"
+        ],
+        [
+            "spine_02",
+            [
+                0,
+                126.763,
+                -1.516
+            ],
+            "spine_01"
+        ],
+        [
+            "spine_03",
+            [
+                0,
+                140.03,
+                -3.498
+            ],
+            "spine_02"
+        ],
+        [
+            "neck_01",
+            [
+                0,
+                156.421,
+                -5.875
+            ],
+            "spine_03"
+        ],
+        [
+            "head",
+            [
+                0,
+                165.516,
+                -3.978
+            ],
+            "neck_01"
+        ],
+        [
+            "left_clavicle",
+            [
+                3.782,
+                152.201,
+                -2.76
+            ],
+            "spine_03"
+        ],
+        [
+            "left_upper_arm",
+            [
+                17.7,
+                149.53,
+                -9.711
+            ],
+            "left_clavicle"
+        ],
+        [
+            "left_lower_arm",
+            [
+                37.265,
+                126.445,
+                -11.911
+            ],
+            "left_upper_arm"
+        ],
+        [
+            "left_hand",
+            [
+                56.646,
+                111.68,
+                -0.335
+            ],
+            "left_lower_arm"
+        ],
+        [
+            "left_thigh",
+            [
+                9.006,
+                95.3,
+                -0.53
+            ],
+            "pelvis"
+        ],
+        [
+            "left_calf",
+            [
+                14.218,
+                53.067,
+                -1.802
+            ],
+            "left_thigh"
+        ],
+        [
+            "left_foot",
+            [
+                17.076,
+                13.466,
+                -8.074
+            ],
+            "left_calf"
+        ],
+        [
+            "left_ball",
+            [
+                17.909,
+                2.812,
+                8.355
+            ],
+            "left_foot"
+        ]
     ],
-
     "simple_comment": "based on dev's common simple rig template",
     "simple": [
-        ["root", [0, 0, 0], "NONE"],
-        ["body", [0, 113.341, 0], "root"],
-        ["head", [0, 160.12, 0], "body"],
-
-        ["left_leg", [24.602, 69.079, -4.831], "body"],
-        ["left_arm", [24.175, 139.205, -6.91], "body"]
+        [
+            "root",
+            [
+                0,
+                0,
+                0
+            ],
+            "NONE"
+        ],
+        [
+            "body",
+            [
+                0,
+                113.341,
+                0
+            ],
+            "root"
+        ],
+        [
+            "head",
+            [
+                0,
+                160.12,
+                0
+            ],
+            "body"
+        ],
+        [
+            "left_leg",
+            [
+                24.602,
+                69.079,
+                -4.831
+            ],
+            "body"
+        ],
+        [
+            "left_arm",
+            [
+                24.175,
+                139.205,
+                -6.91
+            ],
+            "body"
+        ]
+    ],
+    "new_base": [
+        [
+            "joint1",
+            [
+                0.788496693255837,
+                0.0,
+                -1.168153487051086
+            ],
+            "NONE"
+        ],
+        [
+            "joint5",
+            [
+                16.985500720197596,
+                0.0,
+                -24.295943349819098
+            ],
+            "joint4"
+        ],
+        [
+            "joint4",
+            [
+                17.283985478617808,
+                0.0,
+                4.167351397378859
+            ],
+            "joint3"
+        ],
+        [
+            "joint3",
+            [
+                -13.930590188356527,
+                0.0,
+                8.176376581118646
+            ],
+            "joint2"
+        ],
+        [
+            "joint2",
+            [
+                -19.291295358112134,
+                0.0,
+                -10.825171808219675
+            ],
+            "joint1"
+        ]
     ]
-
 }
