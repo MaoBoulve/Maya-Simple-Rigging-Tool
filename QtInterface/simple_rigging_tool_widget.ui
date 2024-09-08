@@ -26,7 +26,7 @@
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -140,7 +140,7 @@
          <item>
           <widget class="QToolBox" name="qToolBox_skeleton">
            <property name="currentIndex">
-            <number>3</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="page_load_rig_templates">
             <property name="geometry">
@@ -215,6 +215,14 @@
             </layout>
            </widget>
            <widget class="QWidget" name="page_save_RigTemplate">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>256</width>
+              <height>121</height>
+             </rect>
+            </property>
             <attribute name="label">
              <string>Save Rig Template</string>
             </attribute>
@@ -289,6 +297,14 @@
             </layout>
            </widget>
            <widget class="QWidget" name="page_mirror_joints">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>239</width>
+              <height>125</height>
+             </rect>
+            </property>
             <attribute name="label">
              <string>Mirror Rig</string>
             </attribute>
@@ -590,15 +606,15 @@
          <item>
           <widget class="QToolBox" name="toolBox_2">
            <property name="currentIndex">
-            <number>3</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="page_control_create">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>119</height>
+              <width>239</width>
+              <height>117</height>
              </rect>
             </property>
             <attribute name="label">
@@ -771,6 +787,14 @@
             </layout>
            </widget>
            <widget class="QWidget" name="page_control_constraints">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>203</width>
+              <height>114</height>
+             </rect>
+            </property>
             <attribute name="label">
              <string>Joint Control Constraints</string>
             </attribute>
@@ -867,6 +891,14 @@
             </layout>
            </widget>
            <widget class="QWidget" name="page_mirror_controls">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>239</width>
+              <height>123</height>
+             </rect>
+            </property>
             <attribute name="label">
              <string>Mirror Controls</string>
             </attribute>
@@ -1201,8 +1233,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>239</width>
-              <height>168</height>
+              <width>183</width>
+              <height>184</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -1425,8 +1457,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>239</width>
-              <height>168</height>
+              <width>183</width>
+              <height>216</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1710,7 +1742,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGrp_jointMirrorAxis"/>
   <buttongroup name="btnGrp_controlMirrorAxis"/>
+  <buttongroup name="btnGrp_jointMirrorAxis"/>
  </buttongroups>
 </ui>
