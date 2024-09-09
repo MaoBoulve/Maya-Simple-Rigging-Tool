@@ -474,6 +474,7 @@ class DependentNode(MetaNode):
         """
         return self.get_first_connection(node_type='transform')
 
+
     def __init__(self, parent=None, node_name='dependent_node', node=None, namespace="", **kwargs):
         super().__init__(node_name, node, namespace, **kwargs)
         if not node:
@@ -485,6 +486,22 @@ class DependentNode(MetaNode):
                 dependent_network = self.dependent_node(parent=parent_node, namespace=namespace)
 
             dependent_network.connect_node(self.node)
+
+    @classmethod
+    def get_metadata_class_instance_from_maya_node(cls):
+        maya_node = cls.__get_class_maya_node()
+        class_instance = cls(node=maya_node)
+
+        return class_instance
+
+    @classmethod
+    def __get_class_maya_node(cls):
+        maya_get = pm.ls(cls.maya_node_name)
+
+        if maya_get:
+            return maya_get[0]
+        else:
+            return None
 
 
 class DemoCore(DependentNode):

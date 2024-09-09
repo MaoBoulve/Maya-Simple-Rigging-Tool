@@ -73,6 +73,89 @@ def _check_and_convert_null_get_input(get_value):
 
     return get_value
 
+class SkeletonRigToolMetadataNode(DependentNode):
+    """
+    Skeleton metadata node
+    """
+    dependent_node = Core
+    maya_node_name = 'skeleton_rigging_tool'
+
+    def __init__(self, parent=None, node_name=maya_node_name, node=None, namespace=""):
+        super().__init__(parent, node_name, node, namespace,
+                         rig_root_joint=('', 'string'))
+        return
+
+    @classmethod
+    def set_rig_root_joint(cls, root_joint):
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
+        SkeletonRigToolMetadataNode.set(class_instance, 'rig_root_joint', root_joint)
+
+        return
+
+    @classmethod
+    def get_target_control_shape(cls):
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
+        root_joint = SkeletonRigToolMetadataNode.get(class_instance, 'rig_root_joint')
+
+        root_joint = pm.ls(root_joint)
+
+        if root_joint:
+            return root_joint[0]
+        else:
+            return None
+
+class RigControllersMetadataNode(DependentNode):
+    """
+    Rig Control metadata node
+    """
+    dependent_node = Core
+    maya_node_name = 'rig_control'
+
+    def __init__(self, parent=None, node_name=maya_node_name, node=None, namespace=""):
+        super().__init__(parent, node_name, node, namespace,
+                         target_control_shape=('', 'string'),
+                         target_joint=('', 'string'))
+        return
+
+
+    @classmethod
+    def set_target_control_shape(cls, control_shape):
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
+        RigControllersMetadataNode.set(class_instance, 'target_control_shape', control_shape)
+
+        return
+
+    @classmethod
+    def get_target_control_shape(cls):
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
+        target_control_shape = RigControllersMetadataNode.get(class_instance, 'target_control_shape')
+
+        target_control_shape = pm.ls(target_control_shape)
+
+        if target_control_shape:
+            return target_control_shape[0]
+        else:
+            return None
+
+    @classmethod
+    def set_target_joint(cls, target_joint):
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
+        RigControllersMetadataNode.set(class_instance, 'target_joint', target_joint)
+
+        return
+
+    @classmethod
+    def get_target_joint(cls):
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
+        target_joint = RigControllersMetadataNode.get(class_instance, 'target_joint')
+
+        target_joint = pm.ls(target_joint)
+
+        if target_joint:
+            return target_joint[0]
+        else:
+            return None
+
 class WeightPaintingMetadataNode(DependentNode):
     """
     Weight painting metadata node. Stores current settings for joint/mesh/vertex in weight painting tab
@@ -87,32 +170,17 @@ class WeightPaintingMetadataNode(DependentNode):
                          vertex=('', 'string'))
         return
 
-    @classmethod
-    def __get_weight_painting_maya_node(cls):
-        maya_get = pm.ls(cls.maya_node_name)
-
-        if maya_get:
-            return maya_get[0]
-        else:
-            return None
-
-    @classmethod
-    def __get_weight_painting_metadata_instance(cls):
-        maya_node = cls.__get_weight_painting_maya_node()
-        metadata_instance = WeightPaintingMetadataNode(node=maya_node)
-
-        return metadata_instance
 
     @classmethod
     def set_new_weight_paint_joint(cls, joint_name):
-        class_instance = cls.__get_weight_painting_metadata_instance()
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
         WeightPaintingMetadataNode.set(class_instance, 'joint', joint_name)
 
         return
 
     @classmethod
     def get_weight_paint_joint(cls):
-        class_instance = cls.__get_weight_painting_metadata_instance()
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
         joint_name = WeightPaintingMetadataNode.get(class_instance, 'joint')
 
         joint_object = pm.ls(joint_name)
@@ -125,14 +193,14 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def set_new_mesh(cls, mesh_name):
-        class_instance = cls.__get_weight_painting_metadata_instance()
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
         WeightPaintingMetadataNode.set(class_instance, 'mesh', mesh_name)
 
         return
 
     @classmethod
     def get_mesh(cls):
-        class_instance = cls.__get_weight_painting_metadata_instance()
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
         mesh_name = WeightPaintingMetadataNode.get(class_instance, 'mesh')
 
         mesh_object = pm.ls(mesh_name)
@@ -145,7 +213,7 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def set_new_vertex_list(cls, vertex_list):
-        class_instance = cls.__get_weight_painting_metadata_instance()
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
 
         vertex_list = [str(x) for x in vertex_list]
 
@@ -157,7 +225,7 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def get_vertex_list(cls):
-        class_instance = cls.__get_weight_painting_metadata_instance()
+        class_instance = cls.get_metadata_class_instance_from_maya_node()
 
         long_string = WeightPaintingMetadataNode.get(class_instance, 'vertex')
         vertex_list = _parse_attribute_string_to_list(long_string)
@@ -167,72 +235,7 @@ class WeightPaintingMetadataNode(DependentNode):
 
         return vertex_list
 
-class RigControllersMetadataNode(DependentNode):
-    """
-    Rig Control metadata node
-    """
-    dependent_node = Core
-    maya_node_name = 'rig_control'
 
-    def __init__(self, parent=None, node_name=maya_node_name, node=None, namespace=""):
-        super().__init__(parent, node_name, node, namespace,
-                         target_control_shape=('', 'string'),
-                         control_group_to_mirror=('', 'string'))
-        return
-
-    @classmethod
-    def __get_weight_painting_maya_node(cls):
-        maya_get = pm.ls(cls.maya_node_name)
-
-        if maya_get:
-            return maya_get[0]
-        else:
-            return None
-
-    @classmethod
-    def __get_rig_control_metadata_instance(cls):
-        maya_node = cls.__get_weight_painting_maya_node()
-        metadata_instance = RigControllersMetadataNode(node=maya_node)
-
-        return metadata_instance
-
-    @classmethod
-    def set_target_control_shape(cls, control_shape):
-        class_instance = cls.__get_rig_control_metadata_instance()
-        RigControllersMetadataNode.set(class_instance, 'target_control_shape', control_shape)
-
-        return
-
-    @classmethod
-    def get_target_control_shape(cls):
-        class_instance = cls.__get_rig_control_metadata_instance()
-        target_control_shape = RigControllersMetadataNode.get(class_instance, 'target_control_shape')
-
-        target_control_shape = pm.ls(target_control_shape)
-
-        if target_control_shape:
-            return target_control_shape[0]
-        else:
-            return None
-
-    @classmethod
-    def set_control_group_to_mirror(cls, control_group):
-        class_instance = cls.__get_rig_control_metadata_instance()
-        RigControllersMetadataNode.set(class_instance, 'control_group_to_mirror', control_group)
-
-        return
-
-    @classmethod
-    def get_control_group_to_mirror(cls):
-        class_instance = cls.__get_rig_control_metadata_instance()
-        control_group_to_mirror = RigControllersMetadataNode.get(class_instance, 'control_group_to_mirror')
-
-        control_group_to_mirror = pm.ls(control_group_to_mirror)
-
-        if control_group_to_mirror:
-            return control_group_to_mirror[0]
-        else:
-            return None
 
 
 class OutputLog(DependentNode):
