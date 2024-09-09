@@ -1,23 +1,24 @@
 import sys
 
 # rename [User directory name] to user account Maya files is installed under
-sys.path.append('/Users/ceeja/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Metadata')
-sys.path.append('/Users/ceeja/Documents/maya/scripts/Maya-Simple-Rigging-Tool/QtInterface')
-sys.path.append('/Users/ceeja/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Rigging')
+sys.path.append('/Users/cmendoza/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Metadata')
+sys.path.append('/Users/cmendoza/Documents/maya/scripts/Maya-Simple-Rigging-Tool/QtInterface')
+sys.path.append('/Users/cmendoza/Documents/maya/scripts/Maya-Simple-Rigging-Tool/Rigging')
 
 # initial import
-import rigging_tasks
 import rigging_user_commands
+import skeleton_tab_widget
+import rig_control_tab_widget
 import simple_rigging_tool_widget
 import importlib
-import rigging_network_nodes
 
 # reimport
 importlib.reload(rigging_user_commands)
-importlib.reload(rigging_tasks)
+importlib.reload(skeleton_tab_widget)
+importlib.reload(rig_control_tab_widget)
 importlib.reload(simple_rigging_tool_widget)
-importlib.reload(rigging_network_nodes)
 
 # main testing
 
-rigging_tasks.TDD_test_task()
+# rigging_tasks.TDD_test_task()
+rigging_user_commands.open_simple_rig_tool()
