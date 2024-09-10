@@ -10,13 +10,75 @@
 Command module for handling metadata data
 """
 
-from rigging_tasks import WeightPainting
-from rigging_network_nodes import WeightPaintingMetadataNode
+from rigging_tasks import WeightPainting, SkeletonRigging, RigControl
+from rigging_network_nodes import WeightPaintingMetadataNode, RigControllersMetadataNode, SkeletonRigToolMetadataNode
 import output_system_commands
 
 
+class SkeletonRiggingCommands:
 
+    @classmethod
+    def set_rig_root_joint(cls, new_joint):
+        """
+        :param new_joint:
+        :return:
+        """
 
+        is_valid = SkeletonRigging.check_is_object_a_valid_joint(new_joint)
+
+        if is_valid:
+            SkeletonRigToolMetadataNode.set_rig_root_joint(new_joint)
+
+        return is_valid
+
+    @classmethod
+    def get_current_rig_root_joint(cls):
+        joint = SkeletonRigToolMetadataNode.get_rig_root_joint()
+        return joint
+
+class RigControlCommands:
+
+    @classmethod
+    def set_target_control(cls, new_target_control):
+        """
+
+        :param new_target_control:
+        :return:
+        """
+
+        is_valid = RigControl.check_is_object_a_valid_nurbs_shape(new_target_control)
+
+        if is_valid:
+            RigControllersMetadataNode.set_target_control_shape(new_target_control)
+
+        return is_valid
+
+    @classmethod
+    def get_current_target_control(cls):
+
+        control_shape = RigControllersMetadataNode.get_target_control_shape()
+        return control_shape
+
+    @classmethod
+    def set_new_target_joint(cls, new_joint):
+        """
+
+        :param new_joint:
+        :return:
+        """
+
+        is_valid = RigControl.check_is_object_a_valid_joint(new_joint)
+
+        if is_valid:
+            RigControllersMetadataNode.set_target_joint(new_joint)
+
+        return is_valid
+
+    @classmethod
+    def get_current_target_joint(cls):
+
+        target_joint = RigControllersMetadataNode.get_target_joint()
+        return target_joint
 
 class WeightPaintingCommands:
 
@@ -32,9 +94,6 @@ class WeightPaintingCommands:
         if is_valid:
             WeightPaintingMetadataNode.set_new_weight_paint_joint(new_joint)
 
-        else:
-            output_system_commands.append_to_output_log("-Object is not a Mesh")
-
         return is_valid
 
     @classmethod
@@ -48,9 +107,6 @@ class WeightPaintingCommands:
         if is_valid:
             WeightPaintingMetadataNode.set_new_mesh(new_mesh)
 
-        else:
-            output_system_commands.append_to_output_log("-Object is not a Joint")
-
         return is_valid
 
     @classmethod
@@ -63,9 +119,6 @@ class WeightPaintingCommands:
 
         if is_valid:
             WeightPaintingMetadataNode.set_new_vertex_list(vertex_list)
-
-        else:
-            output_system_commands.append_to_output_log("-Object is not Vertex/Vertices from a single mesh")
 
         return is_valid
 

@@ -75,7 +75,7 @@ def _check_and_convert_null_get_input(get_value):
 
 class SkeletonRigToolMetadataNode(DependentNode):
     """
-    Skeleton metadata node
+    SkeletonRigging metadata node
     """
     dependent_node = Core
     maya_node_name = 'skeleton_rigging_tool'
@@ -93,7 +93,7 @@ class SkeletonRigToolMetadataNode(DependentNode):
         return
 
     @classmethod
-    def get_target_control_shape(cls):
+    def get_rig_root_joint(cls):
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         root_joint = SkeletonRigToolMetadataNode.get(class_instance, 'rig_root_joint')
 

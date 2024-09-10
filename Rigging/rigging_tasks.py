@@ -19,7 +19,7 @@ import rigging_json_parser
 def TDD_test_task():
     print("TDD_test_task")
     # RigSetup.save_rig_base_to_json_file(pm.ls(sl=True)[0])
-    Skeleton.create_rig_base_from_json_file("new_base", joint_notation="")
+    SkeletonRigging.create_rig_base_from_json_file("new_base", joint_notation="")
     return
 
 def _append_to_user_output_log(new_entry):
@@ -29,7 +29,7 @@ def _append_to_user_output_log(new_entry):
     return
 
 
-class Skeleton:
+class SkeletonRigging:
     """
     Rig class for handling joint creation
     """
@@ -248,6 +248,23 @@ class Skeleton:
         pm.select(clear=True)
 
         return
+
+    @classmethod
+    def check_is_object_a_valid_joint(cls, object_to_check):
+
+        if len(object_to_check) != 1:
+            # Multiple or zero objects selected
+            _append_to_user_output_log("-Did not select only 1 object")
+            return False
+
+        if pm.objectType(object_to_check) != 'joint':
+            # Object is not a joint object
+            _append_to_user_output_log("-Object is not a Joint")
+
+
+            return False
+
+        return True
 
 class RigControl:
     """
@@ -489,6 +506,36 @@ class RigControl:
             z_scale = 1
         return x_scale, y_scale, z_scale
 
+    @classmethod
+    def check_is_object_a_valid_joint(cls, object_to_check):
+
+        if len(object_to_check) != 1:
+            # Multiple or zero objects selected
+            _append_to_user_output_log("-Did not select only 1 object")
+            return False
+
+        if pm.objectType(object_to_check) != 'joint':
+            # Object is not a joint object
+            _append_to_user_output_log("-Object is not a Joint")
+            return False
+
+        return True
+
+    @classmethod
+    def check_is_object_a_valid_nurbs_shape(cls, object_to_check):
+
+        if len(object_to_check) != 1:
+            # Multiple or zero objects selected
+            _append_to_user_output_log("-Did not select only 1 object")
+            return False
+
+        if pm.objectType(object_to_check) != 'nurbsCurve':
+            # Object is not a nurbs object
+            _append_to_user_output_log("-Object is not a NURBS shape")
+            return False
+
+        return True
+
 
 class WeightPainting:
     """
@@ -597,10 +644,12 @@ class WeightPainting:
 
         if len(user_selected_object) != 1:
             # Multiple or zero objects selected
+            _append_to_user_output_log("-Did not select only 1 object")
             return False
 
         if pm.objectType(user_selected_object) != 'joint':
             # Object is not a joint object
+            _append_to_user_output_log("-Object is not a joint")
             return False
 
         return True
@@ -610,10 +659,12 @@ class WeightPainting:
 
         if len(user_selected_object) != 1:
             # Multiple or zero objects selected
+            _append_to_user_output_log("-Did not select only 1 object")
             return False
 
         if pm.objectType(user_selected_object) != 'mesh' and pm.objectType(user_selected_object) != 'transform':
             # Object is not a mesh/shape object
+            _append_to_user_output_log("-Object is not a mesh (or transform of a mesh object)")
             return False
 
         return True
@@ -622,6 +673,7 @@ class WeightPainting:
     def check_is_object_valid_vertex_list(cls, user_selected_list):
 
         if len(user_selected_list) == 0:
+            _append_to_user_output_log("-Zero objects were selected")
             # Zero objects selected
             return False
 
@@ -629,6 +681,7 @@ class WeightPainting:
 
         if invalid_list:
             # Non-vertex selected
+            _append_to_user_output_log("-Object(s) are not vertex")
             return False
 
         single_vertex = user_selected_list[0]
@@ -638,6 +691,7 @@ class WeightPainting:
 
         if invalid_list:
             # Vertex from multiple different shapes selected
+            _append_to_user_output_log("-Vertex from different shapes selected")
             return False
 
         return True

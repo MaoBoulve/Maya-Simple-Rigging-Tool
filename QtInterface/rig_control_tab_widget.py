@@ -10,6 +10,7 @@ from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
 import qt_maya_utils as QtMayaUtils
+from rigging_system_commands import RigControlCommands
 
 
 class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
@@ -73,11 +74,59 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
     def _on_btn_assignTargetControl_clicked(self):
         print("btn_assignTargetControl")
         # get maya obj
+        self._assign_selected_control_as_new_target_control()
+
         return
+
+    def _assign_selected_control_as_new_target_control(self):
+
+
+        is_success, new_control = _DataHandler.update_target_control()
+
+        if is_success:
+            self._update_target_control(new_control)
+
+        return
+
+    def _update_target_control(self, new_control):
+        """
+        Removes prior item, adds new item
+        :param new_control: string entry
+        """
+
+        self.list_skeletonRootJoint.takeItem(0)
+        self.list_skeletonRootJoint.addItem(new_control)
+
+        return
+
 
     def _on_btn_assignTargetJoint_clicked(self):
         print("btn_assignTargetJoint")
         # get maya obj
+
+        self._assign_selected_joint_as_new_target_joint()
+
+        return
+
+    def _assign_selected_joint_as_new_target_joint(self):
+
+
+        is_success, new_joint = _DataHandler.update_target_joint()
+
+        if is_success:
+            self._update_target_joint(new_joint)
+
+        return
+
+
+    def _update_target_joint(self, new_joint):
+        """
+        Removes prior item, adds new item
+        :param new_joint: string entry
+        """
+
+        self.list_skeletonRootJoint.takeItem(0)
+        self.list_skeletonRootJoint.addItem(new_joint)
 
         return
 
@@ -144,3 +193,34 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         print("list_rigControl_targetJoint")
 
         return
+
+class _DataHandler:
+    """
+
+    """
+
+    @classmethod
+    def update_target_control(cls):
+        new_joint = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = RigControlCommands.set_target_control(new_joint)
+
+        if is_success:
+            new_joint_name = str(new_joint[0])
+
+        else:
+            new_joint_name = ""
+
+        return is_success, new_joint_name
+
+    @classmethod
+    def update_target_joint(cls):
+        new_joint = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = RigControlCommands.set_new_target_joint(new_joint)
+
+        if is_success:
+            new_joint_name = str(new_joint[0])
+
+        else:
+            new_joint_name = ""
+
+        return is_success, new_joint_name

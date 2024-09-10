@@ -10,7 +10,7 @@ from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
 import qt_maya_utils as QtMayaUtils
-from rigging_system_commands import WeightPaintingCommands
+from rigging_system_commands import SkeletonRiggingCommands
 
 class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
@@ -49,10 +49,33 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         return
 
-
     def _on_btn_skeletonNewJoint_clicked(self):
         print("btn_skeletonNewJoint")
         # get selected maya obj, validate, set
+
+        self._assign_selected_joint_as_new_rig_root_joint()
+        return
+
+    def _assign_selected_joint_as_new_rig_root_joint(self):
+
+
+        is_success, new_joint = _DataHandler.update_rig_root_joint()
+
+        if is_success:
+            self._update_rig_root_joint(new_joint)
+
+        return
+
+
+    def _update_rig_root_joint(self, new_root_joint):
+        """
+        Removes prior item, adds new item
+        :param new_root_joint: string entry
+        """
+
+        self.list_skeletonRootJoint.takeItem(0)
+        self.list_skeletonRootJoint.addItem(new_root_joint)
+
         return
 
     def _on_btn_loadRigTemplate_clicked(self):
@@ -110,3 +133,16 @@ class _DataHandler:
     """
     
     """
+
+    @classmethod
+    def update_rig_root_joint(cls):
+        new_root_joint = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = SkeletonRiggingCommands.set_rig_root_joint(new_root_joint)
+
+        if is_success:
+            new_joint_name = str(new_root_joint[0])
+
+        else:
+            new_joint_name = ""
+
+        return is_success, new_joint_name
