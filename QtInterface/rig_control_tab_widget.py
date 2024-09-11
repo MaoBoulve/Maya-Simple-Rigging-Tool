@@ -163,8 +163,11 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         replace_text = self.lineEdit_mirrorControlReplace.text()
         mirror_axis = self.btnGrp_controlMirrorAxis.checkedId()
 
+        _DataHandler.mirror_control_hierarchy(search_text=search_text, replace_text=replace_text,
+                                              mirror_axis_button_ID=mirror_axis)
         print(f"Search {search_text}, Replace {replace_text}, Mirror Option {mirror_axis}")
 
+        return
     def _on_btn_constrainParent_clicked(self):
         print("btn_constrainParent")
         # TODO: complete UI task
@@ -178,21 +181,37 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
                                       self.checkBox_constrainRotation.isChecked(),
                                       self.checkBox_constrainScale.isChecked())
 
-        print(f"Translate: {translate}, Rotation: {rotation}, Scale: {scale}")
 
+        print(f"Translate: {translate}, Rotation: {rotation}, Scale: {scale}")
+        self._parent_constraint_on_joint(translate=translate, rotation=rotation, scale=scale)
+        return
+
+    def _parent_constraint_on_joint(self, translate, rotation, scale):
+        _DataHandler.create_parent_constraint(translate=translate, rotate=rotation, scale=scale)
+        return
 
     def _on_btn_constrainPoint_clicked(self):
         # TODO: complete UI task
         print("btn_constrainPoint")
+        self._point_constraint_on_joint()
         self._call_output_update()
 
+        return
+
+    def _point_constraint_on_joint(self):
+        _DataHandler.create_point_constraint()
         return
 
 
     def _on_btn_constrainPoleVector_clicked(self):
         # TODO: complete UI task
         print("btn_constrainPoleVector")
+        self._pole_vector_constraint_on_joint()
         self._call_output_update()
+        return
+
+    def _pole_vector_constraint_on_joint(self):
+        _DataHandler.create_pole_vector()
         return
 
     def _on_list_targetControl_item_clicked(self, item_clicked):
@@ -250,4 +269,45 @@ class _DataHandler:
     def select_current_target_control_in_maya(cls):
         object_to_select = RigControlCommands.get_current_target_control()
         QtMayaUtils.select_maya_object(object_to_select)
+        return
+
+    @classmethod
+    def mirror_control_hierarchy(cls, search_text, replace_text, mirror_axis_button_ID):
+
+        # -2 - X
+        # -3 - Y
+        # -4 - Z
+
+        if mirror_axis_button_ID == -2:
+            mirrorX = False
+            mirrorY = True
+            mirrorZ = False
+        elif mirror_axis_button_ID == -3:
+            mirrorX = True
+            mirrorY = False
+            mirrorZ = False
+        else:
+            mirrorX = False
+            mirrorY = False
+            mirrorZ = True
+
+        RigControlCommands.mirror_metadata_control_shapes(search_text=search_text, replace_text=replace_text,
+                                                          xMirror=mirrorX, yMirror=mirrorY, zMirror=mirrorZ)
+        return
+
+    @classmethod
+    def create_parent_constraint(cls, translate, rotate, scale):
+        RigControlCommands.parent_constraint_target_control_over_target_joint(constrainTranslate=translate,
+                                                                              constrainRotate=rotate,
+                                                                              constrainScale=scale)
+        return
+
+    @classmethod
+    def create_point_constraint(cls):
+        RigControlCommands.point_constraint_target_control_over_target_joint()
+        return
+
+    @classmethod
+    def create_pole_vector(cls):
+        RigControlCommands.pole_vector_constraint_target_control_over_target_joint()
         return

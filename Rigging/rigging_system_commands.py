@@ -12,7 +12,7 @@ Command module for handling metadata data
 
 from rigging_tasks import WeightPainting, SkeletonRigging, RigControl
 from rigging_network_nodes import WeightPaintingMetadataNode, RigControllersMetadataNode, SkeletonRigToolMetadataNode
-import output_system_commands
+from output_system_commands import OutputLog
 
 
 class SkeletonRiggingCommands:
@@ -46,16 +46,24 @@ class SkeletonRiggingCommands:
     @classmethod
     def save_rig_template_from_metadata_joint_rig(cls, template_name):
         root_joint = cls.get_current_rig_root_joint()
-        SkeletonRigging.save_rig_base_to_json_file(root_joint, joint_list_name=template_name)
+        if root_joint:
+            SkeletonRigging.save_rig_base_to_json_file(root_joint, joint_list_name=template_name)
+
+        else:
+            OutputLog.add_to_output_log("Root joint does not exist", "")
 
         return
 
     @classmethod
     def mirror_rig_on_metadata_joint_rig(cls, search_text, replace_text, mirrorYZ=True, mirrorXY=True, mirrorZX=True):
         root_joint = cls.get_current_rig_root_joint()
-        SkeletonRigging.mirror_joint_chain(root_joint,
-                                           mirrorYZ=mirrorYZ, mirrorXY=mirrorXY, mirrorXZ=mirrorZX,
-                                           search_name=search_text, replace_name=replace_text)
+        if root_joint:
+            SkeletonRigging.mirror_joint_chain(root_joint,
+                                               mirrorYZ=mirrorYZ, mirrorXY=mirrorXY, mirrorXZ=mirrorZX,
+                                               search_name=search_text, replace_name=replace_text)
+
+        else:
+            OutputLog.add_to_output_log("Root joint does not exist", "")
 
         return
 class RigControlCommands:
@@ -105,8 +113,12 @@ class RigControlCommands:
     @classmethod
     def create_control_on_target_joint(cls, joint_notation, control_notation):
         target_joint = cls.get_current_target_joint()
-        RigControl.create_control_shape_on_joint(target_joint, joint_notation=joint_notation,
-                                                 controller_notation=control_notation)
+        if target_joint:
+            RigControl.create_control_shape_on_joint(target_joint, joint_notation=joint_notation,
+                                                     controller_notation=control_notation)
+        else:
+            OutputLog.add_to_output_log("Target joint does not exist", "")
+
         return
 
     @classmethod
@@ -114,8 +126,13 @@ class RigControlCommands:
         target_control = cls.get_current_target_control()
         target_joint = cls.get_current_target_joint()
 
+        if target_joint is None or target_control is None:
+            OutputLog.add_to_output_log("Target control or joint does not exist", "")
+            return
+
         RigControl.parent_constrain_control_to_joint(control_shape=target_control, joint=target_joint,
-                                                     constrainTranslate=constrainTranslate, constrainRotate=constrainRotate,
+                                                     constrainTranslate=constrainTranslate,
+                                                     constrainRotate=constrainRotate,
                                                      constrainScale=constrainScale)
 
         return
@@ -124,6 +141,10 @@ class RigControlCommands:
     def point_constraint_target_control_over_target_joint(cls):
         target_control = cls.get_current_target_control()
         target_joint = cls.get_current_target_joint()
+
+        if target_joint is None or target_control is None:
+            OutputLog.add_to_output_log("Target control or joint does not exist", "")
+            return
 
         RigControl.point_constrain_control_to_joint(control_shape=target_control, joint=target_joint)
 
@@ -134,6 +155,10 @@ class RigControlCommands:
         target_control = cls.get_current_target_control()
         target_joint = cls.get_current_target_joint()
 
+        if target_joint is None or target_control is None:
+            OutputLog.add_to_output_log("Target control or joint does not exist", "")
+            return
+
         RigControl.pole_vector_constrain_control_to_joint(control_shape=target_control, joint=target_joint)
 
         return
@@ -141,6 +166,10 @@ class RigControlCommands:
     @classmethod
     def mirror_metadata_control_shapes(cls, search_text, replace_text, xMirror, yMirror, zMirror):
         target_control = cls.get_current_target_control()
+
+        if target_control is None:
+            OutputLog.add_to_output_log("Target control does not exist", "")
+            return
 
         RigControl.mirror_control_shapes(root_control_shape=target_control, search_name=search_text,
                                          replace_name=replace_text, xMirror=xMirror, yMirror=yMirror, zMirror=zMirror)
@@ -194,6 +223,10 @@ class WeightPaintingCommands:
         mesh = cls.get_current_weight_paint_mesh()
         joint = cls.get_current_weight_paint_joint()
 
+        if mesh is None or joint is None:
+            OutputLog.add_to_output_log("Mesh or Joint do not exist", "")
+            return
+
         WeightPainting.set_mesh_weight_paint_influence_from_joint(skinned_mesh=mesh, joint_influence=weight_paint_value, joint=joint)
         return
 
@@ -201,6 +234,10 @@ class WeightPaintingCommands:
     def apply_joint_weight_paint_on_metadata_vertex(cls, weight_paint_value):
         vertex = cls.get_current_weight_paint_vertex_list()
         joint = cls.get_current_weight_paint_joint()
+
+        if vertex is None or joint is None:
+            OutputLog.add_to_output_log("Vertex or Joint do not exist", "")
+            return
 
         WeightPainting.set_vertex_weight_paint_influence_from_joint(selected_vertex=vertex, joint_influence=weight_paint_value, joint=joint)
         return
