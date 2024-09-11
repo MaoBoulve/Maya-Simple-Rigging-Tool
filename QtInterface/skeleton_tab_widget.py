@@ -87,6 +87,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
     def _on_btn_loadRigTemplate_clicked(self):
         print("btn_loadRigTemplate")
 
+        # TODO: complete UI task
         self._load_rig_template()
         self._call_output_update()
 
@@ -98,6 +99,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         if template_to_load:
 
             print(template_to_load[0].text())
+            _DataHandler.load_rig_template(template_to_load[0].text())
 
         else:
             OutputLog.add_to_output_log("-Please select a template", "")
@@ -107,6 +109,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
     def _on_btn_saveRigTemplate_clicked(self):
         print("btn_saveRigTemplate")
 
+        # TODO: complete UI task
         self._save_rig_template()
         self._call_output_update()
 
@@ -115,14 +118,22 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
     def _save_rig_template(self):
         # get root joint hierarchy
         # read list
-
+        # TODO: complete UI task
         new_template_name = self.lineEdit_TemplateName.text()
+
+        if new_template_name:
+            _DataHandler.save_rig_template(new_template_name)
+
+        else:
+            OutputLog.add_to_output_log("-Please enter a template name", "")
+
         print(new_template_name)
+        return
 
 
     def _on_btn_mirrorRig_clicked(self):
         print("btn_mirrorRig")
-
+        # TODO: complete UI task
         self._mirror_root_rig_hierarchy()
         self._call_output_update()
 
@@ -136,9 +147,14 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         print(f"Search {search_text}, Replace {replace_text}, Mirror Option {mirror_axis}")
 
+        _DataHandler.mirror_root_rig(search_text=search_text, replace_text=replace_text,
+                                     mirrorAxisRadioButtonID=mirror_axis)
+
 
     def _on_list_skeletonRootJoint_item_clicked(self, item_clicked):
         print("list_skeletonRootJoint")
+        # TODO: complete UI task
+        _DataHandler.select_current_rig_root_joint_in_maya()
         self._call_output_update()
         return
 
@@ -161,3 +177,46 @@ class _DataHandler:
             new_joint_name = ""
 
         return is_success, new_joint_name
+
+
+    @classmethod
+    def load_rig_template(cls, template_name):
+        SkeletonRiggingCommands.load_rig_template(template_name)
+        return
+
+    @classmethod
+    def save_rig_template(cls, template_name):
+        SkeletonRiggingCommands.save_rig_template_from_metadata_joint_rig(template_name)
+        return
+
+    @classmethod
+    def mirror_root_rig(cls, search_text, replace_text, mirrorAxisRadioButtonID):
+        # -2 - YZ
+        # -3 - XY
+        # -4 - ZX
+
+        if mirrorAxisRadioButtonID == -2:
+            mirrorXY = False
+            mirrorYZ = True
+            mirrorZX = False
+        elif mirrorAxisRadioButtonID == -3:
+            mirrorXY = True
+            mirrorYZ = False
+            mirrorZX = False
+        else:
+            mirrorXY = False
+            mirrorYZ = False
+            mirrorZX = True
+
+
+        SkeletonRiggingCommands.mirror_rig_on_metadata_joint_rig(search_text=search_text, replace_text=replace_text,
+                                                                 mirrorXY=mirrorXY, mirrorYZ=mirrorYZ,
+                                                                 mirrorZX=mirrorZX)
+
+        return
+
+    @classmethod
+    def select_current_rig_root_joint_in_maya(cls):
+        object_to_select = SkeletonRiggingCommands.get_current_rig_root_joint()
+        QtMayaUtils.select_maya_object(object_to_select)
+        return

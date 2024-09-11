@@ -45,14 +45,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         self.checkBox_constrainTranslate = self.QWidget_instance.findChild(QtWidgets.QCheckBox,
                                                                           'checkBox_constrainTranslate')
 
-        self.doubleSpinBox_controlScale = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox, 'doubleSpinBox_controlScale')
-        self.doubleSpinBox_controlRotX = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox,
-                                                                          'doubleSpinBox_controlRotX')
-        self.doubleSpinBox_controlRotY = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox,
-                                                                          'doubleSpinBox_controlRotY')
-        self.doubleSpinBox_controlRotZ = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox,
-                                                                          'doubleSpinBox_controlRotZ')
-
         self.lineEdit_jointNotation = self.QWidget_instance.findChild(QtWidgets.QLineEdit, 'lineEdit_jointNotation')
         self.lineEdit_controlNotation = self.QWidget_instance.findChild(QtWidgets.QLineEdit, 'lineEdit_controlNotation')
 
@@ -144,21 +136,23 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
     def _on_btn_createControl_clicked(self):
         print("btn_createControl")
+        # TODO: complete UI task
         self._create_control()
         self._call_output_update()
         return
 
     def _create_control(self):
-        scale = self.doubleSpinBox_controlScale.value()
-        rotation = (self.doubleSpinBox_controlRotX.value(),
-                    self.doubleSpinBox_controlRotY.value(),
-                    self.doubleSpinBox_controlRotZ.value())
-        print(f"Scale: {scale}. Rotation: {rotation}")
+
+        joint_notation = self.lineEdit_jointNotation.text()
+        control_notation = self.lineEdit_controlNotation.text()
+        RigControlCommands.create_control_on_target_joint(joint_notation=joint_notation,
+                                                          control_notation=control_notation)
+
         return
 
     def _on_btn_mirrorControls_clicked(self):
         print("btn_mirrorControls")
-
+        # TODO: complete UI task
         self._mirror_control_hierarchy()
         self._call_output_update()
 
@@ -173,7 +167,7 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
     def _on_btn_constrainParent_clicked(self):
         print("btn_constrainParent")
-
+        # TODO: complete UI task
         self._parent_constrain_control_on_joint()
         self._call_output_update()
 
@@ -188,6 +182,7 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_btn_constrainPoint_clicked(self):
+        # TODO: complete UI task
         print("btn_constrainPoint")
         self._call_output_update()
 
@@ -195,17 +190,22 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_btn_constrainPoleVector_clicked(self):
+        # TODO: complete UI task
         print("btn_constrainPoleVector")
         self._call_output_update()
         return
 
     def _on_list_targetControl_item_clicked(self, item_clicked):
+        # TODO: complete UI task
         print("list_targetControl")
+        _DataHandler.select_current_target_control_in_maya()
         self._call_output_update()
         return
 
     def _on_list_rigControl_targetJoint_item_clicked(self, item_clicked):
+        # TODO: complete UI task
         print("list_rigControl_targetJoint")
+        _DataHandler.select_current_target_joint_in_maya()
         self._call_output_update()
         return
 
@@ -239,3 +239,15 @@ class _DataHandler:
             new_joint_name = ""
 
         return is_success, new_joint_name
+
+    @classmethod
+    def select_current_target_joint_in_maya(cls):
+        object_to_select = RigControlCommands.get_current_target_joint()
+        QtMayaUtils.select_maya_object(object_to_select)
+        return
+
+    @classmethod
+    def select_current_target_control_in_maya(cls):
+        object_to_select = RigControlCommands.get_current_target_control()
+        QtMayaUtils.select_maya_object(object_to_select)
+        return
