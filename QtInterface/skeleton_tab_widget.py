@@ -49,11 +49,19 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         return
 
+    def _call_output_update(self):
+        """
+        Calls SimpleRigtoolWindowWidget function for populate output widget
+        """
+        self.parent_window.populate_output_widget()
+        return
+
     def _on_btn_skeletonNewJoint_clicked(self):
         print("btn_skeletonNewJoint")
         # get selected maya obj, validate, set
 
         self._assign_selected_joint_as_new_rig_root_joint()
+        self._call_output_update()
         return
 
     def _assign_selected_joint_as_new_rig_root_joint(self):
@@ -82,6 +90,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         print("btn_loadRigTemplate")
 
         self._load_rig_template()
+        self._call_output_update()
 
         return
 
@@ -95,6 +104,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         print("btn_saveRigTemplate")
 
         self._save_rig_template()
+        self._call_output_update()
 
         return
 
@@ -110,6 +120,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         print("btn_mirrorRig")
 
         self._mirror_root_rig_hierarchy()
+        self._call_output_update()
 
         return
 
@@ -124,7 +135,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
     def _on_list_skeletonRootJoint_item_clicked(self, item_clicked):
         print("list_skeletonRootJoint")
-
+        self._call_output_update()
         return
 
 

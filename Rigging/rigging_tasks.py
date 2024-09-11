@@ -259,8 +259,7 @@ class SkeletonRigging:
 
         if pm.objectType(object_to_check) != 'joint':
             # Object is not a joint object
-            _append_to_user_output_log("-Object is not a Joint")
-
+            _append_to_user_output_log(f"-Object {object_to_check[0]} is not a Joint")
 
             return False
 
@@ -516,7 +515,7 @@ class RigControl:
 
         if pm.objectType(object_to_check) != 'joint':
             # Object is not a joint object
-            _append_to_user_output_log("-Object is not a Joint")
+            _append_to_user_output_log(f"-Object {object_to_check[0]} is not a Joint")
             return False
 
         return True
@@ -528,10 +527,14 @@ class RigControl:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Did not select only 1 object")
             return False
+        object_to_check = object_to_check[0]
+
+        if pm.objectType(object_to_check) == 'transform':
+            object_to_check = object_to_check.getShape()
 
         if pm.objectType(object_to_check) != 'nurbsCurve':
             # Object is not a nurbs object
-            _append_to_user_output_log("-Object is not a NURBS shape")
+            _append_to_user_output_log(f"-Object {object_to_check} is not a NURBS shape")
             return False
 
         return True
@@ -640,31 +643,31 @@ class WeightPainting:
         return True
 
     @classmethod
-    def check_is_object_a_valid_joint(cls, user_selected_object):
+    def check_is_object_a_valid_joint(cls, object_to_check):
 
-        if len(user_selected_object) != 1:
+        if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Did not select only 1 object")
             return False
 
-        if pm.objectType(user_selected_object) != 'joint':
+        if pm.objectType(object_to_check) != 'joint':
             # Object is not a joint object
-            _append_to_user_output_log("-Object is not a joint")
+            _append_to_user_output_log(f"-Object {object_to_check[0]} is not a joint")
             return False
 
         return True
 
     @classmethod
-    def check_is_object_a_valid_mesh(cls, user_selected_object):
+    def check_is_object_a_valid_mesh(cls, object_to_check):
 
-        if len(user_selected_object) != 1:
+        if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Did not select only 1 object")
             return False
 
-        if pm.objectType(user_selected_object) != 'mesh' and pm.objectType(user_selected_object) != 'transform':
+        if pm.objectType(object_to_check) != 'mesh' and pm.objectType(object_to_check) != 'transform':
             # Object is not a mesh/shape object
-            _append_to_user_output_log("-Object is not a mesh (or transform of a mesh object)")
+            _append_to_user_output_log(f"-Object {object_to_check[0]} is not a mesh (or transform of a mesh object)")
             return False
 
         return True

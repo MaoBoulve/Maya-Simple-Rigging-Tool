@@ -71,11 +71,18 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         return
 
+    def _call_output_update(self):
+        """
+        Calls SimpleRigtoolWindowWidget function for populate output widget
+        """
+        self.parent_window.populate_output_widget()
+        return
+
     def _on_btn_assignTargetControl_clicked(self):
         print("btn_assignTargetControl")
         # get maya obj
         self._assign_selected_control_as_new_target_control()
-
+        self._call_output_update()
         return
 
     def _assign_selected_control_as_new_target_control(self):
@@ -94,8 +101,8 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         :param new_control: string entry
         """
 
-        self.list_skeletonRootJoint.takeItem(0)
-        self.list_skeletonRootJoint.addItem(new_control)
+        self.list_targetControl.takeItem(0)
+        self.list_targetControl.addItem(new_control)
 
         return
 
@@ -105,7 +112,7 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         # get maya obj
 
         self._assign_selected_joint_as_new_target_joint()
-
+        self._call_output_update()
         return
 
     def _assign_selected_joint_as_new_target_joint(self):
@@ -125,8 +132,8 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         :param new_joint: string entry
         """
 
-        self.list_skeletonRootJoint.takeItem(0)
-        self.list_skeletonRootJoint.addItem(new_joint)
+        self.list_rigControl_targetJoint.takeItem(0)
+        self.list_rigControl_targetJoint.addItem(new_joint)
 
         return
 
@@ -134,6 +141,7 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
     def _on_btn_createControl_clicked(self):
         print("btn_createControl")
         self._create_control()
+        self._call_output_update()
         return
 
     def _create_control(self):
@@ -148,6 +156,7 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         print("btn_mirrorControls")
 
         self._mirror_control_hierarchy()
+        self._call_output_update()
 
         return
 
@@ -162,6 +171,7 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         print("btn_constrainParent")
 
         self._parent_constrain_control_on_joint()
+        self._call_output_update()
 
         return
 
@@ -175,23 +185,24 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
     def _on_btn_constrainPoint_clicked(self):
         print("btn_constrainPoint")
+        self._call_output_update()
 
         return
 
 
     def _on_btn_constrainPoleVector_clicked(self):
         print("btn_constrainPoleVector")
-
+        self._call_output_update()
         return
 
     def _on_list_targetControl_item_clicked(self, item_clicked):
         print("list_targetControl")
-
+        self._call_output_update()
         return
 
     def _on_list_rigControl_targetJoint_item_clicked(self, item_clicked):
         print("list_rigControl_targetJoint")
-
+        self._call_output_update()
         return
 
 class _DataHandler:
@@ -201,16 +212,16 @@ class _DataHandler:
 
     @classmethod
     def update_target_control(cls):
-        new_joint = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = RigControlCommands.set_target_control(new_joint)
+        new_control = QtMayaUtils.get_user_selected_maya_objects()
+        is_success = RigControlCommands.set_target_control(new_control)
 
         if is_success:
-            new_joint_name = str(new_joint[0])
+            new_control_name = str(new_control[0])
 
         else:
-            new_joint_name = ""
+            new_control_name = ""
 
-        return is_success, new_joint_name
+        return is_success, new_control_name
 
     @classmethod
     def update_target_joint(cls):
