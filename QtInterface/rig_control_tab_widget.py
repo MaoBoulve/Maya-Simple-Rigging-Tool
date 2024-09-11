@@ -52,6 +52,10 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
                                                                           'doubleSpinBox_controlRotY')
         self.doubleSpinBox_controlRotZ = self.QWidget_instance.findChild(QtWidgets.QDoubleSpinBox,
                                                                           'doubleSpinBox_controlRotZ')
+
+        self.lineEdit_jointNotation = self.QWidget_instance.findChild(QtWidgets.QLineEdit, 'lineEdit_jointNotation')
+        self.lineEdit_controlNotation = self.QWidget_instance.findChild(QtWidgets.QLineEdit, 'lineEdit_controlNotation')
+
         return
 
     def _initialize_ui_element_states(self):

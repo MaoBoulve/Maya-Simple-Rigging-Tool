@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>484</height>
+    <width>298</width>
+    <height>479</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -151,8 +151,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>144</height>
+              <width>270</width>
+              <height>141</height>
              </rect>
             </property>
             <attribute name="label">
@@ -210,6 +210,23 @@
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_26">
+                   <item>
+                    <widget class="QLabel" name="label_24">
+                     <property name="text">
+                      <string>Templates found in rigging_joint_bases.json</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
                  <item>
                   <widget class="QPushButton" name="btn_loadRigTemplate">
                    <property name="styleSheet">
@@ -285,7 +302,7 @@
                <item>
                 <widget class="QLabel" name="label_13">
                  <property name="text">
-                  <string>Template saves hierarchy based on root joint</string>
+                  <string>Template saves hierarchy based on root joint to rigging_joint_bases.json</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -500,8 +517,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>144</height>
+              <width>270</width>
+              <height>141</height>
              </rect>
             </property>
             <attribute name="label">
@@ -515,6 +532,12 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_rigControl">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <attribute name="title">
        <string>Rig Control</string>
       </attribute>
@@ -596,20 +619,54 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_21">
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
            <item>
-            <widget class="QLabel" name="label_23">
+            <widget class="QLabel" name="label_16">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
-              <string>Set selected control as target</string>
+              <string>Target Joint</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
              </property>
              <property name="wordWrap">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QListWidget" name="list_rigControl_targetJoint">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>150</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="flow">
+              <enum>QListView::LeftToRight</enum>
+             </property>
+             <item>
+              <property name="text">
+               <string>--</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_21">
            <item>
             <widget class="QPushButton" name="btn_assignTargetControl">
              <property name="styleSheet">
@@ -622,20 +679,45 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QLabel" name="label_23">
+             <property name="text">
+              <string>Sets selected object to target</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_assignTargetJoint">
+             <property name="styleSheet">
+              <string notr="true">QPushButton{
+    background-color: midnightblue;
+}</string>
+             </property>
+             <property name="text">
+              <string>Assign Joint</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>
           <widget class="QToolBox" name="toolBox_2">
            <property name="currentIndex">
-            <number>3</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page_control_create">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>139</height>
+              <width>270</width>
+              <height>105</height>
              </rect>
             </property>
             <attribute name="label">
@@ -659,170 +741,79 @@
              </property>
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_17">
+               <property name="spacing">
+                <number>6</number>
+               </property>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_19">
+                <layout class="QHBoxLayout" name="horizontalLayout">
                  <item>
-                  <widget class="QLabel" name="label_16">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
+                  <widget class="QLabel" name="label_25">
                    <property name="text">
-                    <string>Target Joint</string>
+                    <string>Joint Notation</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
                    <property name="wordWrap">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QListWidget" name="list_rigControl_targetJoint">
+                  <widget class="QLineEdit" name="lineEdit_jointNotation">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>150</width>
-                     <height>25</height>
+                     <width>50</width>
+                     <height>16777215</height>
                     </size>
                    </property>
-                   <property name="flow">
-                    <enum>QListView::LeftToRight</enum>
+                   <property name="text">
+                    <string>_jnt</string>
                    </property>
-                   <item>
-                    <property name="text">
-                     <string>--</string>
-                    </property>
-                   </item>
                   </widget>
                  </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_22">
-                 <property name="spacing">
-                  <number>3</number>
-                 </property>
                  <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_29">
-                   <item>
-                    <widget class="QLabel" name="label_18">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Control Scale</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_controlScale">
-                     <property name="minimum">
-                      <double>0.010000000000000</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.500000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>1.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
+                  <widget class="QLabel" name="label_26">
+                   <property name="text">
+                    <string>Control Notation</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                  <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_30">
-                   <item>
-                    <widget class="QLabel" name="label_19">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Control Rotation (XYZ)</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_23">
-                     <item>
-                      <widget class="QDoubleSpinBox" name="doubleSpinBox_controlRotX">
-                       <property name="decimals">
-                        <number>0</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-360.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>360.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QDoubleSpinBox" name="doubleSpinBox_controlRotY">
-                       <property name="decimals">
-                        <number>0</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-360.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>360.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QDoubleSpinBox" name="doubleSpinBox_controlRotZ">
-                       <property name="decimals">
-                        <number>0</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-360.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>360.000000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
+                  <widget class="QLineEdit" name="lineEdit_controlNotation">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>50</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>_ctl</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_25">
-                 <item>
-                  <widget class="QPushButton" name="btn_assignTargetJoint">
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton{
-    background-color: midnightblue;
-}</string>
-                   </property>
-                   <property name="text">
-                    <string>Assign Target Joint</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item>
                   <widget class="QPushButton" name="btn_createControl">
                    <property name="styleSheet">
@@ -846,8 +837,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>139</height>
+              <width>253</width>
+              <height>108</height>
              </rect>
             </property>
             <attribute name="label">
@@ -873,7 +864,7 @@
               <layout class="QVBoxLayout" name="verticalLayout_19">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_24">
-                 <item>
+                 <item alignment="Qt::AlignHCenter">
                   <widget class="QCheckBox" name="checkBox_constrainTranslate">
                    <property name="text">
                     <string>Translate</string>
@@ -883,7 +874,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item>
+                 <item alignment="Qt::AlignHCenter">
                   <widget class="QCheckBox" name="checkBox_constrainRotation">
                    <property name="text">
                     <string>Rotation</string>
@@ -893,7 +884,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item>
+                 <item alignment="Qt::AlignHCenter">
                   <widget class="QCheckBox" name="checkBox_constrainScale">
                    <property name="text">
                     <string>Scale</string>
@@ -950,8 +941,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>139</height>
+              <width>197</width>
+              <height>111</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1109,7 +1100,7 @@
               <x>0</x>
               <y>0</y>
               <width>256</width>
-              <height>139</height>
+              <height>136</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1291,8 +1282,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>160</height>
+              <width>183</width>
+              <height>172</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -1720,8 +1711,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>160</height>
+              <width>270</width>
+              <height>159</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1745,6 +1736,12 @@
    </item>
    <item>
     <widget class="QListWidget" name="list_output">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
@@ -1804,5 +1801,6 @@
  <buttongroups>
   <buttongroup name="btnGrp_jointMirrorAxis"/>
   <buttongroup name="btnGrp_controlMirrorAxis"/>
+  <buttongroup name="btnGrp_jointNotation"/>
  </buttongroups>
 </ui>

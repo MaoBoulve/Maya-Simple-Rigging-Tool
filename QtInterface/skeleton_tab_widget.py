@@ -11,6 +11,7 @@ from PySide2 import QtWidgets
 import qt_maya_widget_base as WidgetTemplate
 import qt_maya_utils as QtMayaUtils
 from rigging_system_commands import SkeletonRiggingCommands
+from output_system_commands import OutputLog
 
 class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
@@ -57,7 +58,6 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_skeletonNewJoint_clicked(self):
-        print("btn_skeletonNewJoint")
         # get selected maya obj, validate, set
 
         self._assign_selected_joint_as_new_rig_root_joint()
@@ -65,8 +65,6 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _assign_selected_joint_as_new_rig_root_joint(self):
-
-
         is_success, new_joint = _DataHandler.update_rig_root_joint()
 
         if is_success:
@@ -96,7 +94,13 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
     def _load_rig_template(self):
         template_to_load = self.list_RigTemplate.selectedItems()
-        print(template_to_load[0].text())
+
+        if template_to_load:
+
+            print(template_to_load[0].text())
+
+        else:
+            OutputLog.add_to_output_log("-Please select a template", "")
 
         return
 

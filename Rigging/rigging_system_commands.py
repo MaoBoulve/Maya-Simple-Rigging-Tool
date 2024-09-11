@@ -36,6 +36,28 @@ class SkeletonRiggingCommands:
         joint = SkeletonRigToolMetadataNode.get_rig_root_joint()
         return joint
 
+    @classmethod
+    def load_rig_template(cls, template_name):
+
+        SkeletonRigging.create_rig_base_from_json_file(joint_list_name=template_name, joint_notation="",
+                                                       end_notation=True)
+        return
+
+    @classmethod
+    def save_rig_template_from_metadata_joint_rig(cls, template_name):
+        root_joint = cls.get_current_rig_root_joint()
+        SkeletonRigging.save_rig_base_to_json_file(root_joint, joint_list_name=template_name)
+
+        return
+
+    @classmethod
+    def mirror_rig_on_metadata_joint_rig(cls, search_text, replace_text, mirrorYZ=True, mirrorXY=True, mirrorZX=True):
+        root_joint = cls.get_current_rig_root_joint()
+        SkeletonRigging.mirror_joint_chain(root_joint,
+                                           mirrorYZ=mirrorYZ, mirrorXY=mirrorXY, mirrorXZ=mirrorZX,
+                                           search_name=search_text, replace_name=replace_text)
+
+        return
 class RigControlCommands:
 
     @classmethod
@@ -79,6 +101,51 @@ class RigControlCommands:
 
         target_joint = RigControllersMetadataNode.get_target_joint()
         return target_joint
+
+    @classmethod
+    def create_control_on_target_joint(cls, joint_notation, control_notation):
+        target_joint = cls.get_current_target_joint()
+        RigControl.create_control_shape_on_joint(target_joint, joint_notation=joint_notation,
+                                                 controller_notation=control_notation)
+        return
+
+    @classmethod
+    def parent_constraint_target_control_over_target_joint(cls, constrainTranslate, constrainRotate, constrainScale):
+        target_control = cls.get_current_target_control()
+        target_joint = cls.get_current_target_joint()
+
+        RigControl.parent_constrain_control_to_joint(control_shape=target_control, joint=target_joint,
+                                                     constrainTranslate=constrainTranslate, constrainRotate=constrainRotate,
+                                                     constrainScale=constrainScale)
+
+        return
+
+    @classmethod
+    def point_constraint_target_control_over_target_joint(cls):
+        target_control = cls.get_current_target_control()
+        target_joint = cls.get_current_target_joint()
+
+        RigControl.point_constrain_control_to_joint(control_shape=target_control, joint=target_joint)
+
+        return
+
+    @classmethod
+    def pole_vector_constraint_target_control_over_target_joint(cls):
+        target_control = cls.get_current_target_control()
+        target_joint = cls.get_current_target_joint()
+
+        RigControl.pole_vector_constrain_control_to_joint(control_shape=target_control, joint=target_joint)
+
+        return
+
+    @classmethod
+    def mirror_metadata_control_shapes(cls, search_text, replace_text, xMirror, yMirror, zMirror):
+        target_control = cls.get_current_target_control()
+
+        RigControl.mirror_control_shapes(root_control_shape=target_control, search_name=search_text,
+                                         replace_name=replace_text, xMirror=xMirror, yMirror=yMirror, zMirror=zMirror)
+        return
+
 
 class WeightPaintingCommands:
 

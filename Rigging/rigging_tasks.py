@@ -338,30 +338,24 @@ class RigControl:
 
     @classmethod
     def parent_constrain_control_to_joint(cls, control_shape, joint,
-                                          translateX=True, translateY=True, translateZ=True,
-                                          rotateX=True, rotateY=True, rotateZ=True,
-                                          scaleX=True, scaleY=True, scaleZ=True,
+                                          constrainTranslate=True,
+                                          constrainRotate=True,
+                                          constrainScale=True,
                                           maintain_offset=True):
         """
         Apply parent constraint with bools for the 10 settings applicable
         :param control_shape: shape object
         :param joint: joint object
-        :param translateX: bool, constrain translate axis
-        :param translateY: bool, constrain translate axis
-        :param translateZ: bool, constrain translate axis
-        :param rotateX: bool, constrain rotate axis
-        :param rotateY: bool, constrain rotate axis
-        :param rotateZ: bool, constrain rotate axis
-        :param scaleX: bool, constrain scale axis
-        :param scaleY: bool, constrain scale axis
-        :param scaleZ: bool, constrain scale axis
+        :param constrainTranslate: bool, constrain translate axis
+        :param constrainRotate: bool, constrain translate axis
+        :param constrainScale: bool, constrain translate axis
         :param maintain_offset: bool, move parented object or keep in place. False snaps child object to parent
         """
 
 
-        skip_rotate, skip_scale, skip_translate = cls._make_vectors_for_axis_to_skip(rotateX, rotateY, rotateZ,
-                                                                                     scaleX,scaleY,scaleZ,
-                                                                                     translateX,translateY, translateZ)
+        skip_rotate, skip_scale, skip_translate = cls._make_vectors_for_axis_to_skip(constrainTranslate,
+                                                                                     constrainRotate,
+                                                                                     constrainScale)
 
         # Parent constraint ONLY constrains translate and rotate
         pm.parentConstraint(control_shape, joint, st=skip_translate, sr=skip_rotate, maintainOffset=maintain_offset)
@@ -369,8 +363,7 @@ class RigControl:
         return
 
     @classmethod
-    def _make_vectors_for_axis_to_skip(cls, rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ,
-                                       translateX, translateY, translateZ):
+    def _make_vectors_for_axis_to_skip(cls, constrainTranslate, constrainRotate, constrainScale):
         """
         Creates vectors for parent and scale constraint axis to skip. Parameters are all bool for axis to skip
         :return: skip_rotate, skip_scale, skip_translate
@@ -378,24 +371,12 @@ class RigControl:
         skip_translate = []
         skip_rotate = []
         skip_scale = []
-        if not translateX:
-            skip_translate.append("x")
-        if not translateY:
-            skip_translate.append("y")
-        if not translateZ:
-            skip_translate.append("z")
-        if not rotateX:
-            skip_rotate.append("x")
-        if not rotateY:
-            skip_rotate.append("y")
-        if not rotateZ:
-            skip_rotate.append("z")
-        if not scaleX:
-            skip_scale.append("x")
-        if not scaleY:
-            skip_scale.append("y")
-        if not scaleZ:
-            skip_scale.append("z")
+        if not constrainTranslate:
+            skip_translate.append(['x','y','z'])
+        if not constrainRotate:
+            skip_rotate.append(['x','y','z'])
+        if not constrainScale:
+            skip_scale.append(['x','y','z'])
 
 
         return skip_rotate, skip_scale, skip_translate
