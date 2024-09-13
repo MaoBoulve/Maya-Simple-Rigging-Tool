@@ -1,7 +1,5 @@
-# Asset Validation Tool
+# Simple Rigging Tool
 # Copyright (C) 2024 Chris 'Nel' Mendoza
-
-# network_core module copyright of Micah Zahm
 
 # This file is part of Simple Rigging Tool
 # Simple Rigging Tool is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

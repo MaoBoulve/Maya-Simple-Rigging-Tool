@@ -1,4 +1,4 @@
-# Asset Validation Tool
+# Simple Rigging Tool
 # Copyright (C) 2024 Chris 'Nel' Mendoza
 
 # This file is part of Simple Rigging Tool
@@ -106,9 +106,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_loadRigTemplate_clicked(self):
-        print("btn_loadRigTemplate")
 
-        # TODO: complete UI task
         self._load_rig_template()
         self._call_output_update()
 
@@ -119,7 +117,6 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         if template_to_load:
 
-            print(template_to_load[0].text())
             _DataHandler.load_rig_template(template_to_load[0].text())
 
         else:
@@ -128,10 +125,8 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_saveRigTemplate_clicked(self):
-        print("btn_saveRigTemplate")
-
-        # TODO: complete UI task
         self._save_rig_template()
+        self._populate_rig_template_list()
         self._call_output_update()
 
         return
@@ -154,8 +149,6 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_btn_mirrorRig_clicked(self):
-        print("btn_mirrorRig")
-        # TODO: complete UI task
         self._mirror_root_rig_hierarchy()
         self._call_output_update()
 
@@ -167,16 +160,11 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         replace_text = self.lineEdit_MirrorRigReplace.text()
         mirror_axis = self.btnGrp_jointMirrorAxis.checkedId()
 
-        print(f"Search {search_text}, Replace {replace_text}, Mirror Option {mirror_axis}")
-
         _DataHandler.mirror_root_rig(search_text=search_text, replace_text=replace_text,
                                      mirrorAxisRadioButtonID=mirror_axis)
 
 
     def _on_btn_removeRigTemplate_clicked(self):
-        print("btn_loadRigTemplate")
-
-        # TODO: complete UI task
         self._remove_rig_template()
         self._call_output_update()
 
@@ -186,9 +174,8 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         template_to_load = self.list_RigTemplate.selectedItems()
 
         if template_to_load:
-
-            print(template_to_load[0].text())
             _DataHandler.delete_rig_template(template_to_load[0].text())
+            self._populate_rig_template_list()
 
         else:
             OutputLog.add_to_output_log("-Please select a template", "")
@@ -197,8 +184,6 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_list_skeletonRootJoint_item_clicked(self, item_clicked):
-        print("list_skeletonRootJoint")
-        # TODO: complete UI task
         _DataHandler.select_current_rig_root_joint_in_maya()
         self._call_output_update()
         return

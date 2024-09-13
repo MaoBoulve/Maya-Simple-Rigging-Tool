@@ -1,4 +1,4 @@
-# Asset Validation Tool
+# Simple Rigging Tool
 # Copyright (C) 2024 Chris 'Nel' Mendoza
 
 # This file is part of Simple Rigging Tool

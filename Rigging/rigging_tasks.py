@@ -1,4 +1,4 @@
-# Asset Validation Tool
+# Simple Rigging Tool
 # Copyright (C) 2024 Chris 'Nel' Mendoza
 
 # This file is part of Simple Rigging Tool
@@ -19,7 +19,7 @@ import rigging_json_parser
 def TDD_test_task():
     print("TDD_test_task")
     # RigSetup.save_rig_base_to_json_file(pm.ls(sl=True)[0])
-    SkeletonRigging.create_rig_base_from_json_file("new_base", joint_notation="")
+
     return
 
 def _append_to_user_output_log(new_entry):
@@ -49,8 +49,11 @@ class SkeletonRigging:
             cls._create_joint_chain_from_joint_entry_list(joint_list, joint_notation=joint_notation,
                                                           notation_at_end=end_notation)
 
+            _append_to_user_output_log(f"-Created rig template: {joint_list_name}")
+
+
         except KeyError:
-            _append_to_user_output_log(f"Joint list not in JSON file: {joint_list_name}")
+            _append_to_user_output_log(f"-Joint list not in JSON file: {joint_list_name}")
 
 
         return
@@ -90,7 +93,7 @@ class SkeletonRigging:
             parent_joint_name_list.append(parent_joint)
 
             if pm.ls(joint_name):
-                _append_to_user_output_log(f"Object already exists: {joint_name}")
+                _append_to_user_output_log(f"-Object already exists: {joint_name}")
                 pm.delete(joint_list)
                 joint_list.clear()
                 break
@@ -161,13 +164,16 @@ class SkeletonRigging:
         :param search_name: string, joint string to search for
         :param replace_name: string, joint string to replace
         """
+
+        pm.select(clear=True)
         joint_list = cls._get_joint_hierarchy(root_joint)
+        print(joint_list)
 
         # looking for the first joints in side joint chains
         joints_to_mirror = [joint for joint in joint_list if search_name in str(joint)]
         joints_to_mirror = cls._search_for_first_joint_in_joints_to_mirror(joints_to_mirror, search_name)
 
-
+        print(joints_to_mirror)
 
         for joint in joints_to_mirror:
             pm.mirrorJoint(joint, searchReplace=(search_name,replace_name), mirrorYZ=mirrorYZ,
@@ -175,6 +181,8 @@ class SkeletonRigging:
 
 
         pm.select(clear=True)
+
+        _append_to_user_output_log(f"-Joint mirror successful")
 
         return
 
@@ -187,7 +195,7 @@ class SkeletonRigging:
 
         joint_list = list()
         joint_list.append(root_joint)
-        joint_list.append(pm.listRelatives(allDescendents=True))
+        joint_list.append(pm.listRelatives(root_joint, allDescendents=True))
         joint_list = pm.ls(joint_list, type='joint')
 
         return joint_list
@@ -247,6 +255,8 @@ class SkeletonRigging:
         rigging_json_parser.RiggingJSONDataManagement.add_joint_list_to_json_file(joint_entry_list, joint_list_name)
         pm.select(clear=True)
 
+        _append_to_user_output_log(f"-Saved new template: {joint_list_name}")
+
         return
 
     @classmethod
@@ -254,7 +264,7 @@ class SkeletonRigging:
 
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
-            _append_to_user_output_log("-Did not select only 1 object")
+            _append_to_user_output_log("-Single object not selected")
             return False
 
         if pm.objectType(object_to_check) != 'joint':
@@ -277,8 +287,10 @@ class SkeletonRigging:
         try: # try-except catches when the json file was edited externally
             rigging_json_parser.RiggingJSONDataManagement.remove_joint_list_from_json_file(template_to_remove)
 
+            _append_to_user_output_log(f"-Removed [{template_to_remove}] from templates")
+
         except KeyError:
-            _append_to_user_output_log(f"Joint list not in JSON file: {template_to_remove}")
+            _append_to_user_output_log(f"-Joint list not in JSON file: {template_to_remove}")
 
         return
 
@@ -366,7 +378,7 @@ class RigControl:
 
         joint_list = list()
         joint_list.append(root_joint)
-        joint_list.append(pm.listRelatives(allDescendents=True))
+        joint_list.append(pm.listRelatives(root_joint, allDescendents=True))
         joint_list = pm.ls(joint_list, type='joint')
 
         return joint_list
@@ -439,62 +451,38 @@ class RigControl:
 
     @classmethod
     def mirror_control_shapes(cls, root_control_shape, search_name='left_', replace_name='right_',
-                              xMirror=True, yMirror=False, zMirror=False):
+                              XYMirror=True, YZMirror=False, ZXMirror=False):
         """
         Mirrors control objects across specified axis. Replaces search_name substring with replace_name substring
         :param root_control_shape: root shape maya object
         :param search_name: substring to determine shape should be mirrored
         :param replace_name: substring to put on mirrored objects
-        :param xMirror: bool, mirror across X
-        :param yMirror: bool, mirror across Y
-        :param zMirror: bool, mirror across Z
+        :param XYMirror: bool, mirror across XY
+        :param YZMirror: bool, mirror across YZ
+        :param ZXMirror: bool, mirror across ZX
         """
         # Get all nurbs curves transforms from hierarchy
 
-        hierarchy_nurbs = pm.listRelatives(root_control_shape, allDescendents=True, type='nurbsCurve')
-
-        control_hierarchy = pm.listRelatives(hierarchy_nurbs, parent=True)
-        control_hierarchy = pm.ls(control_hierarchy, type='transform')
-
-        control_to_mirror = [control for control in control_hierarchy if search_name in str(control)]
+        control_to_mirror = cls._get_controls_to_mirror_from_hierarchy(root_control_shape, search_name)
         control_parents = pm.listRelatives(control_to_mirror, parent=True, shapes=True)
 
-        initial_control_group = pm.group(control_to_mirror, world=True)
-        pm.xform(initial_control_group, pivots=[0,0,0], worldSpace=True)
-
-        # create duplicate of the controls
-        duplicate_controls_group = pm.duplicate(initial_control_group)
+        duplicate_controls_group, initial_control_group = cls._group_and_duplicate_controls(control_to_mirror)
 
         # create scale vector
-        x_scale, y_scale, z_scale = cls._make_axis_scale_values(xMirror, yMirror, zMirror)
+        x_scale, y_scale, z_scale = cls._make_axis_scale_values(XYMirror, YZMirror, ZXMirror)
 
         # mirror the new group
-        mirror_group_scale = str(duplicate_controls_group[0]) + '.scale'
-        pm.setAttr(mirror_group_scale, x_scale, y_scale, z_scale)
+        cls._set_duplicate_group_scale_to_mirror(duplicate_controls_group, x_scale, y_scale, z_scale)
 
+        # get control objects only
         hierarchy_nurbs = pm.listRelatives(duplicate_controls_group, allDescendents=True, type='nurbsCurve')
         mirrored_controls = pm.listRelatives(hierarchy_nurbs, parent=True)
 
         # renames mirrored group
-        for single_control in mirrored_controls:
-            old_name = str(single_control)
-            new_name = old_name.replace(search_name, replace_name)
-            pm.rename(single_control, new_name)
+        cls._rename_mirrored_controls(mirrored_controls, replace_name, search_name)
 
-        control_parent_iterations = len(control_parents)
-
-        for i in range(control_parent_iterations):
-            parent_target = control_parents[i]
-
-            # parent old control to prior parent
-            pm.parent(control_to_mirror[i], parent_target)
-
-            # check if parent should be to a new control
-            if search_name in str(parent_target):
-                parent_target = parent_target.replace(search_name, replace_name)
-
-            # parent new control
-            pm.parent(mirrored_controls[i], parent_target)
+        cls._parent_mirrored_control_hierarchy(control_parents, control_to_mirror, mirrored_controls, replace_name,
+                                               search_name)
 
         # delete group maya nodes
         pm.delete(initial_control_group)
@@ -503,34 +491,108 @@ class RigControl:
         return
 
     @classmethod
-    def _make_axis_scale_values(cls, xMirror, yMirror, zMirror):
+    def _set_duplicate_group_scale_to_mirror(cls, duplicate_controls_group, x_scale, y_scale, z_scale):
+
+        mirror_group_scale = str(duplicate_controls_group[0]) + '.scale'
+        pm.setAttr(mirror_group_scale, x_scale, y_scale, z_scale)
+
+        return
+
+    @classmethod
+    def _get_controls_to_mirror_from_hierarchy(cls, root_control_shape, search_name):
+        hierarchy_nurbs = pm.listRelatives(root_control_shape, allDescendents=True, type='nurbsCurve')
+
+        control_hierarchy = pm.listRelatives(hierarchy_nurbs, parent=True)
+        control_hierarchy = pm.ls(control_hierarchy, type='transform')
+
+        control_to_mirror = [control for control in control_hierarchy if search_name in str(control)]
+
+        return control_to_mirror
+
+    @classmethod
+    def _group_and_duplicate_controls(cls, control_to_mirror):
+        initial_control_group = pm.group(control_to_mirror, world=True)
+        pm.xform(initial_control_group, pivots=[0, 0, 0], worldSpace=True)
+
+        # create duplicate of the controls
+        duplicate_controls_group = pm.duplicate(initial_control_group)
+
+        return duplicate_controls_group, initial_control_group
+
+    @classmethod
+    def _make_axis_scale_values(cls, XYMirror, YZMirror, ZXMirror):
         """
         Makes axis scale values for mirroring control shapes.
-        :param xMirror: bool
-        :param yMirror: bool
-        :param zMirror: bool
+        :param XYMirror: bool
+        :param YZMirror: bool
+        :param ZXMirror: bool
         :return: x_scale - int, y_scale - int, z_scale - int
         """
-        if xMirror:
+        if XYMirror:
+            x_scale = 1
+            y_scale = 1
+            z_scale = -1
+
+        elif YZMirror:
             x_scale = -1
+            y_scale = 1
+            z_scale = 1
+
+        elif ZXMirror:
+            x_scale = 1
+            y_scale = -1
+            z_scale = 1
+
         else:
             x_scale = 1
-        if yMirror:
-            y_scale = -1
-        else:
             y_scale = 1
-        if zMirror:
-            z_scale = -1
-        else:
             z_scale = 1
+
         return x_scale, y_scale, z_scale
+
+    @classmethod
+    def _rename_mirrored_controls(cls, mirrored_controls, replace_name, search_name):
+        for single_control in mirrored_controls:
+            old_name = str(single_control)
+            new_name = old_name.replace(search_name, replace_name)
+            pm.rename(single_control, new_name)
+
+        return
+
+    @classmethod
+    def _parent_mirrored_control_hierarchy(cls, control_parents, control_to_mirror, mirrored_controls, replace_name,
+                                           search_name):
+
+        control_parent_iterations = len(control_parents)
+
+        for i in range(control_parent_iterations):
+            parent_target = control_parents[i]
+
+            if parent_target is None or parent_target == "NONE":
+                parent_to_world = True
+            else:
+                parent_to_world = False
+
+            # parent old control to prior parent
+            pm.parent(control_to_mirror[i], parent_target, world=parent_to_world)
+
+            # check if parent should be to a new control
+            if search_name in str(parent_target):
+                parent_target = parent_target.replace(search_name, replace_name)
+
+            # parent new control
+            pm.parent(mirrored_controls[i], parent_target, world=parent_to_world)
+
+        return
+
+
 
     @classmethod
     def check_is_object_a_valid_joint(cls, object_to_check):
 
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
-            _append_to_user_output_log("-Did not select only 1 object")
+            _append_to_user_output_log("-Single object not selected")
             return False
 
         if pm.objectType(object_to_check) != 'joint':
@@ -545,7 +607,7 @@ class RigControl:
 
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
-            _append_to_user_output_log("-Did not select only 1 object")
+            _append_to_user_output_log("-Single object not selected")
             return False
         object_to_check = object_to_check[0]
 
@@ -667,7 +729,7 @@ class WeightPainting:
 
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
-            _append_to_user_output_log("-Did not select only 1 object")
+            _append_to_user_output_log("-Single object not selected")
             return False
 
         if pm.objectType(object_to_check) != 'joint':
@@ -682,7 +744,7 @@ class WeightPainting:
 
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
-            _append_to_user_output_log("-Did not select only 1 object")
+            _append_to_user_output_log("-Single object not selected")
             return False
 
         if pm.objectType(object_to_check) != 'mesh' and pm.objectType(object_to_check) != 'transform':
@@ -696,7 +758,7 @@ class WeightPainting:
     def check_is_object_valid_vertex_list(cls, user_selected_list):
 
         if len(user_selected_list) == 0:
-            _append_to_user_output_log("-Zero objects were selected")
+            _append_to_user_output_log("-No objects were selected")
             # Zero objects selected
             return False
 

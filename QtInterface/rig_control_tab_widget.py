@@ -95,7 +95,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_assignTargetControl_clicked(self):
-        print("btn_assignTargetControl")
         # get maya obj
         self._assign_selected_control_as_new_target_control()
         self._call_output_update()
@@ -124,7 +123,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_btn_assignTargetJoint_clicked(self):
-        print("btn_assignTargetJoint")
         # get maya obj
 
         self._assign_selected_joint_as_new_target_joint()
@@ -155,8 +153,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_btn_createControl_clicked(self):
-        print("btn_createControl")
-        # TODO: complete UI task
         self._create_control()
         self._call_output_update()
         return
@@ -175,8 +171,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_mirrorControls_clicked(self):
-        print("btn_mirrorControls")
-        # TODO: complete UI task
         self._mirror_control_hierarchy()
         self._call_output_update()
 
@@ -189,12 +183,9 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         _DataHandler.mirror_control_hierarchy(search_text=search_text, replace_text=replace_text,
                                               mirror_axis_button_ID=mirror_axis)
-        print(f"Search {search_text}, Replace {replace_text}, Mirror Option {mirror_axis}")
 
         return
     def _on_btn_constrainParent_clicked(self):
-        print("btn_constrainParent")
-        # TODO: complete UI task
         self._parent_constrain_control_on_joint()
         self._call_output_update()
 
@@ -205,8 +196,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
                                       self.checkBox_constrainRotation.isChecked(),
                                       self.checkBox_constrainScale.isChecked())
 
-
-        print(f"Translate: {translate}, Rotation: {rotation}, Scale: {scale}")
         self._parent_constraint_on_joint(translate=translate, rotation=rotation, scale=scale)
         return
 
@@ -215,8 +204,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_btn_constrainPoint_clicked(self):
-        # TODO: complete UI task
-        print("btn_constrainPoint")
         self._point_constraint_on_joint()
         self._call_output_update()
 
@@ -228,8 +215,6 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _on_btn_constrainPoleVector_clicked(self):
-        # TODO: complete UI task
-        print("btn_constrainPoleVector")
         self._pole_vector_constraint_on_joint()
         self._call_output_update()
         return
@@ -239,15 +224,11 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _on_list_targetControl_item_clicked(self, item_clicked):
-        # TODO: complete UI task
-        print("list_targetControl")
         _DataHandler.select_current_target_control_in_maya()
         self._call_output_update()
         return
 
     def _on_list_rigControl_targetJoint_item_clicked(self, item_clicked):
-        # TODO: complete UI task
-        print("list_rigControl_targetJoint")
         _DataHandler.select_current_target_joint_in_maya()
         self._call_output_update()
         return
@@ -306,17 +287,17 @@ class _DataHandler:
     @classmethod
     def mirror_control_hierarchy(cls, search_text, replace_text, mirror_axis_button_ID):
 
-        # -2 - X
-        # -3 - Y
-        # -4 - Z
+        # -2 - XY
+        # -3 - YZ
+        # -4 - ZX
 
         if mirror_axis_button_ID == -2:
-            mirrorX = False
-            mirrorY = True
-            mirrorZ = False
-        elif mirror_axis_button_ID == -3:
             mirrorX = True
             mirrorY = False
+            mirrorZ = False
+        elif mirror_axis_button_ID == -3:
+            mirrorX = False
+            mirrorY = True
             mirrorZ = False
         else:
             mirrorX = False
