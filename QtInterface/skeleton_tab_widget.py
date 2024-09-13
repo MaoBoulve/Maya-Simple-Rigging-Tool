@@ -25,6 +25,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         self.btn_loadRigTemplate = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_loadRigTemplate')
         self.btn_saveRigTemplate = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_saveRigTemplate')
         self.btn_mirrorRig = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_mirrorRig')
+        self.btn_removeRigTemplate = self.QWidget_instance.findChild(QtWidgets.QPushButton, 'btn_removeRigTemplate')
 
         self.list_skeletonRootJoint = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'list_skeletonRootJoint')
         self.list_RigTemplate = self.QWidget_instance.findChild(QtWidgets.QListWidget, 'list_RigTemplate')
@@ -38,13 +39,33 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _initialize_ui_element_states(self):
-        pass
+        self._populate_metadata_rig_root_joint()
+        self._populate_rig_template_list()
+        return
+
+    def _populate_rig_template_list(self):
+        self.list_RigTemplate.clear()
+
+        templates = _DataHandler.get_rig_template_list()
+
+        for name in templates:
+            self.list_RigTemplate.addItem(name)
+
+        return
+
+    def _populate_metadata_rig_root_joint(self):
+        root_joint = _DataHandler.get_metadata_rig_root_joint()
+        self._update_rig_root_joint(str(root_joint))
+
+        return
+
 
     def _create_ui_connections_to_class_functions(self):
         self.btn_skeletonNewJoint.clicked.connect(self._on_btn_skeletonNewJoint_clicked)
         self.btn_loadRigTemplate.clicked.connect(self._on_btn_loadRigTemplate_clicked)
         self.btn_saveRigTemplate.clicked.connect(self._on_btn_saveRigTemplate_clicked)
         self.btn_mirrorRig.clicked.connect(self._on_btn_mirrorRig_clicked)
+        self.btn_removeRigTemplate.clicked.connect(self._on_btn_removeRigTemplate_clicked)
 
         self.list_skeletonRootJoint.itemClicked.connect(self._on_list_skeletonRootJoint_item_clicked)
 
@@ -118,7 +139,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
     def _save_rig_template(self):
         # get root joint hierarchy
         # read list
-        # TODO: complete UI task
+
         new_template_name = self.lineEdit_TemplateName.text()
 
         if new_template_name:
@@ -127,7 +148,8 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         else:
             OutputLog.add_to_output_log("-Please enter a template name", "")
 
-        print(new_template_name)
+        self._populate_rig_template_list()
+
         return
 
 
@@ -149,6 +171,29 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         _DataHandler.mirror_root_rig(search_text=search_text, replace_text=replace_text,
                                      mirrorAxisRadioButtonID=mirror_axis)
+
+
+    def _on_btn_removeRigTemplate_clicked(self):
+        print("btn_loadRigTemplate")
+
+        # TODO: complete UI task
+        self._remove_rig_template()
+        self._call_output_update()
+
+        return
+
+    def _remove_rig_template(self):
+        template_to_load = self.list_RigTemplate.selectedItems()
+
+        if template_to_load:
+
+            print(template_to_load[0].text())
+            _DataHandler.delete_rig_template(template_to_load[0].text())
+
+        else:
+            OutputLog.add_to_output_log("-Please select a template", "")
+
+        return
 
 
     def _on_list_skeletonRootJoint_item_clicked(self, item_clicked):
@@ -177,7 +222,6 @@ class _DataHandler:
             new_joint_name = ""
 
         return is_success, new_joint_name
-
 
     @classmethod
     def load_rig_template(cls, template_name):
@@ -214,6 +258,22 @@ class _DataHandler:
                                                                  mirrorZX=mirrorZX)
 
         return
+
+    @classmethod
+    def delete_rig_template(cls, template_name):
+        SkeletonRiggingCommands.delete_rig_template(template_name)
+        return
+
+    @classmethod
+    def get_rig_template_list(cls):
+        template_list = SkeletonRiggingCommands.get_rig_template_list()
+        return template_list
+
+
+    @classmethod
+    def get_metadata_rig_root_joint(cls):
+        root_joint = SkeletonRiggingCommands.get_current_rig_root_joint()
+        return root_joint
 
     @classmethod
     def select_current_rig_root_joint_in_maya(cls):

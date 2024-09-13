@@ -265,6 +265,34 @@ class SkeletonRigging:
 
         return True
 
+    @classmethod
+    def delete_rig_template_from_json_file(cls, template_to_remove="rig_name"):
+        locked_rigs = ['unity', 'unreal', 'simple']
+
+        if template_to_remove in locked_rigs:
+            _append_to_user_output_log(f"-Please delete default rig [{template_to_remove}] by directly editing 'rigging_joint_bases.json'")
+            return
+
+
+        try: # try-except catches when the json file was edited externally
+            rigging_json_parser.RiggingJSONDataManagement.remove_joint_list_from_json_file(template_to_remove)
+
+        except KeyError:
+            _append_to_user_output_log(f"Joint list not in JSON file: {template_to_remove}")
+
+        return
+
+    @classmethod
+    def get_all_rig_template_names_from_json_file(cls):
+
+        rig_names = rigging_json_parser.RiggingJSONDataManagement.get_all_joint_list_names()
+
+        rig_names = [name for name in rig_names if '_comment' not in name]
+
+        return rig_names
+
+
+
 class RigControl:
     """
     Rig setup class for creating nurbs shapes to control joints
@@ -284,57 +312,64 @@ class RigControl:
         # get controller name from joint name, replacing _jnt with _ctl
         controller_name = joint_name.replace(joint_notation, controller_notation)
 
+        joint_parent = pm.listRelatives(joint, parent=True)
+
+        if joint_parent:
+            # gets world position by temporarily parenting to world
+            joint_parent = str(joint_parent[0])
+            pm.parent(joint, world=True)
+            controller_center = list(pm.getAttr(joint_name + '.translate'))
+            pm.parent(joint, joint_parent)
+
+        else:
+            controller_center = list(pm.getAttr(joint_name + '.translate'))
+
+
         # orient controller to joint translation
-        controller_center = [pm.getAttr(joint_name + '.translateX'),
-                             pm.getAttr(joint_name + '.translateY'),
-                             pm.getAttr(joint_name + '.translateZ')]
-        controller_normal = [0, 0, 0]
-        shape_radius = 3.0
+        shape_radius = 4.0
 
         # create nurbs circle
         nurbs_circle = pm.circle(name=controller_name, radius=shape_radius,
-                                 center=controller_center, normal=controller_normal)
+                                 center=controller_center)
 
         # center pivot of created circle
         pm.xform(nurbs_circle, centerPivots=True)
 
+        if len(nurbs_circle) > 1:
+            # nurbs command generates a second MakeNurbs object, slice list
+            nurbs_circle = nurbs_circle[:1]
+
         return nurbs_circle
 
     @classmethod
-    def set_control_shape_uniform_scale(cls, control_shape, new_scale):
+    def create_control_shape_on_all_joints(cls, root_joint, joint_notation='_jnt', controller_notation='_ctl'):
+
+        all_joints = cls._get_joint_hierarchy(root_joint)
+        shape_to_return = None
+
+
+        for joint in all_joints:
+            created_shape = cls.create_control_shape_on_joint(joint=joint, joint_notation=joint_notation,
+                                                              controller_notation=controller_notation)
+
+            if joint == root_joint:
+                shape_to_return = created_shape
+
+        return shape_to_return
+
+    @staticmethod
+    def _get_joint_hierarchy(root_joint):
         """
-        Sets scale of control_shape via transform node
-        :param control_shape: shape
-        :param new_scale: float, new scale
-        """
-
-        # TODO: validate/get transform if given shape
-
-        # parse control name
-        control_shape_name = str(control_shape)
-        control_scale = control_shape_name + '.scale'
-
-        # set scale uniformly
-        pm.setAttr(control_scale,new_scale, new_scale, new_scale)
-
-        return
-
-    @classmethod
-    def set_control_shape_rotation(cls, control_shape, new_rotate_tuple=(0,0,0)):
-        """
-        Sets new rotation of a control shape via transform node
-        :param control_shape: maya shape object
-        :param new_rotate_tuple: vector3, new rotation
+        Gets all joints in hierarchy (including the root object passed in)
+        :param root_joint: maya object, assumed joint but will not throw error for other types
         """
 
-        # TODO: get transform if given shape node
+        joint_list = list()
+        joint_list.append(root_joint)
+        joint_list.append(pm.listRelatives(allDescendents=True))
+        joint_list = pm.ls(joint_list, type='joint')
 
-        # parse control name
-        control_shape_name = str(control_shape)
-        control_rotate = control_shape_name + '.rotate'
-
-        # set scale uniformly
-        pm.setAttr(control_rotate, new_rotate_tuple)
+        return joint_list
 
     @classmethod
     def parent_constrain_control_to_joint(cls, control_shape, joint,
@@ -460,6 +495,10 @@ class RigControl:
 
             # parent new control
             pm.parent(mirrored_controls[i], parent_target)
+
+        # delete group maya nodes
+        pm.delete(initial_control_group)
+        pm.delete(duplicate_controls_group)
 
         return
 

@@ -80,3 +80,25 @@ class FileWriter:
             json.dump(data, json_file, indent=4)
 
         return
+
+    @classmethod
+    def delete_json_value(cls, entry_to_delete_key, json_filename):
+        """
+        Deletes a full key from top level of json file
+        :param entry_to_delete_key: string, dict key
+        :param json_filename: string, local filename
+        """
+
+        json_file_path = _module_file_path.replace('json_file_parser.py', json_filename)
+
+        with open(json_file_path, 'r') as json_file:
+            # save data and set dict value to arg
+            data = json.load(json_file)
+            del data[entry_to_delete_key]
+
+        with open(json_file_path, 'w') as json_file:
+            # write data, replacing whole data
+            json_file.seek(0)
+            json.dump(data, json_file, indent=4)
+
+            return

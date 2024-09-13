@@ -37,3 +37,25 @@ class RiggingJSONDataManagement:
         FileWriter.write_json_value(entry_key=list_name, entry_value=joint_entry_list, json_filename=cls.__json_filename)
 
         return
+
+    @classmethod
+    def remove_joint_list_from_json_file(cls, list_to_remove):
+        """
+        Removes an entry from json file
+        :param list_to_remove: string, list to remove
+        """
+
+        FileWriter.delete_json_value(entry_to_delete_key=list_to_remove, json_filename=cls.__json_filename)
+
+        return
+
+    @classmethod
+    def get_all_joint_list_names(cls):
+        template_list = []
+
+        json_data = FileReader.get_json_data(cls.__json_filename)
+
+        if json_data:
+            template_list = list(json_data.keys())
+
+        return template_list

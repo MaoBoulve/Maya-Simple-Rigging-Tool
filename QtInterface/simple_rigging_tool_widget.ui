@@ -177,6 +177,19 @@
                 <number>3</number>
                </property>
                <item>
+                <widget class="QLabel" name="label_24">
+                 <property name="text">
+                  <string>Templates found in rigging_joint_bases.json</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QListWidget" name="list_RigTemplate">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -198,12 +211,17 @@
                  </property>
                  <item>
                   <property name="text">
-                   <string>Test1</string>
+                   <string>unity</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>Test2</string>
+                   <string>unreal</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>simple</string>
                   </property>
                  </item>
                 </widget>
@@ -211,24 +229,13 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_12">
                  <item>
-                  <layout class="QVBoxLayout" name="verticalLayout_26">
-                   <item>
-                    <widget class="QLabel" name="label_24">
-                     <property name="text">
-                      <string>Templates found in rigging_joint_bases.json</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                     <property name="wordWrap">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
                   <widget class="QPushButton" name="btn_loadRigTemplate">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true">QPushButton{
     background-color: midnightblue;
@@ -236,6 +243,18 @@
                    </property>
                    <property name="text">
                     <string>Load Template</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_removeRigTemplate">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton{
+    background-color: rgb(85, 0, 0);
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Remove Template</string>
                    </property>
                   </widget>
                  </item>
@@ -250,8 +269,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>144</height>
+              <width>270</width>
+              <height>141</height>
              </rect>
             </property>
             <attribute name="label">
@@ -333,8 +352,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>144</height>
+              <width>270</width>
+              <height>141</height>
              </rect>
             </property>
             <attribute name="label">
@@ -709,7 +728,7 @@
          <item>
           <widget class="QToolBox" name="toolBox_2">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="page_control_create">
             <property name="geometry">
@@ -813,7 +832,42 @@
                 </layout>
                </item>
                <item>
+                <widget class="QLabel" name="label_18">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Created control is assigned as Target Control</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_25">
+                 <property name="leftMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>5</number>
+                 </property>
+                 <item alignment="Qt::AlignHCenter">
+                  <widget class="QCheckBox" name="checkBox_controlCreateChildJoints">
+                   <property name="text">
+                    <string>Create For Child Joints</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item>
                   <widget class="QPushButton" name="btn_createControl">
                    <property name="styleSheet">
@@ -941,7 +995,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>197</width>
+              <width>253</width>
               <height>111</height>
              </rect>
             </property>
@@ -1099,8 +1153,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>256</width>
-              <height>136</height>
+              <width>100</width>
+              <height>30</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1801,6 +1855,5 @@
  <buttongroups>
   <buttongroup name="btnGrp_jointMirrorAxis"/>
   <buttongroup name="btnGrp_controlMirrorAxis"/>
-  <buttongroup name="btnGrp_jointNotation"/>
  </buttongroups>
 </ui>

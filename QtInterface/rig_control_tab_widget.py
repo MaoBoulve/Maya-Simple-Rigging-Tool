@@ -45,13 +45,33 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         self.checkBox_constrainTranslate = self.QWidget_instance.findChild(QtWidgets.QCheckBox,
                                                                           'checkBox_constrainTranslate')
 
+        self.checkBox_controlCreateChildJoints = self.QWidget_instance.findChild(QtWidgets.QCheckBox,
+                                                                                 'checkBox_controlCreateChildJoints')
+
+
         self.lineEdit_jointNotation = self.QWidget_instance.findChild(QtWidgets.QLineEdit, 'lineEdit_jointNotation')
         self.lineEdit_controlNotation = self.QWidget_instance.findChild(QtWidgets.QLineEdit, 'lineEdit_controlNotation')
 
         return
 
     def _initialize_ui_element_states(self):
-        pass
+        self._populate_metadata_target_control()
+        self._populate_metadata_target_joint()
+        return
+
+    def _populate_metadata_target_control(self):
+        target_control = _DataHandler.get_metadata_target_control()
+        self._update_target_control(str(target_control))
+
+        return
+
+    def _populate_metadata_target_joint(self):
+        target_joint = _DataHandler.get_metadata_target_joint()
+        self._update_target_joint(str(target_joint))
+
+        return
+
+
 
     def _create_ui_connections_to_class_functions(self):
         self.btn_assignTargetControl.clicked.connect(self._on_btn_assignTargetControl_clicked)
@@ -145,8 +165,12 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
         joint_notation = self.lineEdit_jointNotation.text()
         control_notation = self.lineEdit_controlNotation.text()
-        RigControlCommands.create_control_on_target_joint(joint_notation=joint_notation,
-                                                          control_notation=control_notation)
+        create_on_child_joints = self.checkBox_controlCreateChildJoints.isChecked()
+
+        _DataHandler.create_target_control(joint_notation=joint_notation, control_notation=control_notation,
+                                           create_on_children=create_on_child_joints)
+
+        self._populate_metadata_target_control()
 
         return
 
@@ -236,7 +260,7 @@ class _DataHandler:
     @classmethod
     def update_target_control(cls):
         new_control = QtMayaUtils.get_user_selected_maya_objects()
-        is_success = RigControlCommands.set_target_control(new_control)
+        is_success = RigControlCommands.set_new_target_control(new_control)
 
         if is_success:
             new_control_name = str(new_control[0])
@@ -258,6 +282,14 @@ class _DataHandler:
             new_joint_name = ""
 
         return is_success, new_joint_name
+
+    @classmethod
+    def create_target_control(cls, joint_notation, control_notation, create_on_children):
+        RigControlCommands.create_control_on_target_joint(joint_notation=joint_notation,
+                                                          control_notation=control_notation,
+                                                          create_on_children=create_on_children)
+
+        return
 
     @classmethod
     def select_current_target_joint_in_maya(cls):
@@ -311,3 +343,13 @@ class _DataHandler:
     def create_pole_vector(cls):
         RigControlCommands.pole_vector_constraint_target_control_over_target_joint()
         return
+
+    @classmethod
+    def get_metadata_target_joint(cls):
+        joint = RigControlCommands.get_current_target_joint()
+        return joint
+
+    @classmethod
+    def get_metadata_target_control(cls):
+        control = RigControlCommands.get_current_target_control()
+        return control

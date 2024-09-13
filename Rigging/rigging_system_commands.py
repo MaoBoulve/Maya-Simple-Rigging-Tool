@@ -66,15 +66,27 @@ class SkeletonRiggingCommands:
             OutputLog.add_to_output_log("Root joint does not exist", "")
 
         return
+
+    @classmethod
+    def delete_rig_template(cls, template_name):
+        SkeletonRigging.delete_rig_template_from_json_file(template_to_remove=template_name)
+        return
+
+    @classmethod
+    def get_rig_template_list(cls):
+        rig_template_list = SkeletonRigging.get_all_rig_template_names_from_json_file()
+        return rig_template_list
 class RigControlCommands:
 
     @classmethod
-    def set_target_control(cls, new_target_control):
+    def set_new_target_control(cls, new_target_control):
         """
 
         :param new_target_control:
         :return:
         """
+
+        print(new_target_control)
 
         is_valid = RigControl.check_is_object_a_valid_nurbs_shape(new_target_control)
 
@@ -111,13 +123,22 @@ class RigControlCommands:
         return target_joint
 
     @classmethod
-    def create_control_on_target_joint(cls, joint_notation, control_notation):
+    def create_control_on_target_joint(cls, joint_notation, control_notation, create_on_children):
         target_joint = cls.get_current_target_joint()
-        if target_joint:
-            RigControl.create_control_shape_on_joint(target_joint, joint_notation=joint_notation,
-                                                     controller_notation=control_notation)
-        else:
+
+        if target_joint is None or target_joint == "":
             OutputLog.add_to_output_log("Target joint does not exist", "")
+            return
+
+        if create_on_children:
+            root_control = RigControl.create_control_shape_on_all_joints(target_joint, joint_notation=joint_notation,
+                                                                         controller_notation=control_notation)
+            cls.set_new_target_control(root_control)
+        else:
+
+            target_control = RigControl.create_control_shape_on_joint(target_joint, joint_notation=joint_notation,
+                                                                      controller_notation=control_notation)
+            cls.set_new_target_control(target_control)
 
         return
 
