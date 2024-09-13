@@ -76,6 +76,11 @@ def get_scene_materials():
 
 
 def count_distinct_vertex_from_sliced_list(vertex_list):
+    """
+    Counts vertex due to maya slicing multiple vertex, causing errors in counting systems
+    :param vertex_list: list of maya objects
+    :return: int, count of vertex
+    """
     full_vertex_list = []
 
     for list_entry in vertex_list:

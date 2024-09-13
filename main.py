@@ -25,4 +25,4 @@ importlib.reload(rigging_tasks)
 # main testing
 
 # rigging_tasks.TDD_test_task()
-rigging_user_commands.open_simple_rig_tool()
+rigging_user_commands.open_tool()

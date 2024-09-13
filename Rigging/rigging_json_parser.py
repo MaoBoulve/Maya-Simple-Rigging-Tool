@@ -6,6 +6,10 @@
 # Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Module deriving from json file parser module to handle data tasks for rigging system
+"""
+
 from json_file_parser import FileWriter, FileReader
 
 
@@ -22,7 +26,8 @@ class RiggingJSONDataManagement:
     @classmethod
     def get_joint_list(cls, list_name_query="list_name"):
         """
-
+        Gets joint list in json file
+        :param list_name_query: string, name of list in json file
         """
 
         json_data = FileReader.get_json_data(cls.__json_filename)
@@ -59,6 +64,10 @@ class RiggingJSONDataManagement:
 
     @classmethod
     def get_all_joint_list_names(cls):
+        """
+        Gets list of all template joint lists in json file
+        :return: template_list - list of string
+        """
         template_list = []
 
         json_data = FileReader.get_json_data(cls.__json_filename)

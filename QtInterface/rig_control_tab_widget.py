@@ -6,6 +6,10 @@
 # Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Tab widget module for Rig Control tasks
+"""
+
 from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
@@ -60,12 +64,18 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _populate_metadata_target_control(self):
+        """
+        Populates UI value from metadata
+        """
         target_control = _DataHandler.get_metadata_target_control()
         self._update_target_control(str(target_control))
 
         return
 
     def _populate_metadata_target_joint(self):
+        """
+        Populates UI value from metadata
+        """
         target_joint = _DataHandler.get_metadata_target_joint()
         self._update_target_joint(str(target_joint))
 
@@ -101,9 +111,11 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _assign_selected_control_as_new_target_control(self):
+        """
+        Sets currently maya object to metadata value
+        """
 
-
-        is_success, new_control = _DataHandler.update_target_control()
+        is_success, new_control = _DataHandler.set_target_control()
 
         if is_success:
             self._update_target_control(new_control)
@@ -130,9 +142,11 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _assign_selected_joint_as_new_target_joint(self):
+        """
+        Sets currently maya object to metadata value
+        """
 
-
-        is_success, new_joint = _DataHandler.update_target_joint()
+        is_success, new_joint = _DataHandler.set_target_joint()
 
         if is_success:
             self._update_target_joint(new_joint)
@@ -158,7 +172,9 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _create_control(self):
-
+        """
+        Creates control on metadata joint, sets as new metadata target control
+        """
         joint_notation = self.lineEdit_jointNotation.text()
         control_notation = self.lineEdit_controlNotation.text()
         create_on_child_joints = self.checkBox_controlCreateChildJoints.isChecked()
@@ -177,6 +193,9 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _mirror_control_hierarchy(self):
+        """
+        Mirrors metadata target control hierarchy
+        """
         search_text = self.lineEdit_mirrorControlSearch.text()
         replace_text = self.lineEdit_mirrorControlReplace.text()
         mirror_axis = self.btnGrp_controlMirrorAxis.checkedId()
@@ -192,14 +211,13 @@ class RigControlTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _parent_constrain_control_on_joint(self):
+        """
+        Calls parent constraint function on control and joint
+        """
         translate, rotation, scale = (self.checkBox_constrainTranslate.isChecked(),
                                       self.checkBox_constrainRotation.isChecked(),
                                       self.checkBox_constrainScale.isChecked())
 
-        self._parent_constraint_on_joint(translate=translate, rotation=rotation, scale=scale)
-        return
-
-    def _parent_constraint_on_joint(self, translate, rotation, scale):
         _DataHandler.create_parent_constraint(translate=translate, rotate=rotation, scale=scale)
         return
 
@@ -239,7 +257,11 @@ class _DataHandler:
     """
 
     @classmethod
-    def update_target_control(cls):
+    def set_target_control(cls):
+        """
+        Sets metadata value from selected maya object
+        :return: is_success - bool, new_control_name - string
+        """
         new_control = QtMayaUtils.get_user_selected_maya_objects()
         is_success = RigControlCommands.set_new_target_control(new_control)
 
@@ -252,7 +274,11 @@ class _DataHandler:
         return is_success, new_control_name
 
     @classmethod
-    def update_target_joint(cls):
+    def set_target_joint(cls):
+        """
+        Sets metadata value from selected maya object
+        :return: is_success - bool, new_joint_name - string
+        """
         new_joint = QtMayaUtils.get_user_selected_maya_objects()
         is_success = RigControlCommands.set_new_target_joint(new_joint)
 
@@ -266,6 +292,12 @@ class _DataHandler:
 
     @classmethod
     def create_target_control(cls, joint_notation, control_notation, create_on_children):
+        """
+        Creates control on metadata joint
+        :param joint_notation: string
+        :param control_notation: string
+        :param create_on_children: bool
+        """
         RigControlCommands.create_control_on_target_joint(joint_notation=joint_notation,
                                                           control_notation=control_notation,
                                                           create_on_children=create_on_children)
@@ -274,19 +306,30 @@ class _DataHandler:
 
     @classmethod
     def select_current_target_joint_in_maya(cls):
+        """
+        Selects metadata object
+        """
         object_to_select = RigControlCommands.get_current_target_joint()
         QtMayaUtils.select_maya_object(object_to_select)
         return
 
     @classmethod
     def select_current_target_control_in_maya(cls):
+        """
+        Selects metadata object
+        """
         object_to_select = RigControlCommands.get_current_target_control()
         QtMayaUtils.select_maya_object(object_to_select)
         return
 
     @classmethod
     def mirror_control_hierarchy(cls, search_text, replace_text, mirror_axis_button_ID):
-
+        """
+        Mirrors control hierarchy from metadata control
+        :param search_text: string
+        :param replace_text: string
+        :param mirror_axis_button_ID: int
+        """
         # -2 - XY
         # -3 - YZ
         # -4 - ZX
@@ -305,7 +348,7 @@ class _DataHandler:
             mirrorZ = True
 
         RigControlCommands.mirror_metadata_control_shapes(search_text=search_text, replace_text=replace_text,
-                                                          xMirror=mirrorX, yMirror=mirrorY, zMirror=mirrorZ)
+                                                          XYMirror=mirrorX, YZMirror=mirrorY, ZXMirror=mirrorZ)
         return
 
     @classmethod

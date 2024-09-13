@@ -7,7 +7,7 @@
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>..
 
 """
-Command module for handling metadata data
+Command module for handling calls to metadata and rigging tasks. Handles cross module communication.
 """
 
 from rigging_tasks import WeightPainting, SkeletonRigging, RigControl
@@ -20,8 +20,8 @@ class SkeletonRiggingCommands:
     @classmethod
     def set_rig_root_joint(cls, new_joint):
         """
-        :param new_joint:
-        :return:
+        Sets metadata rig root joint
+        :param new_joint: maya object
         """
 
         is_valid = SkeletonRigging.check_is_object_a_valid_joint(new_joint)
@@ -34,19 +34,30 @@ class SkeletonRiggingCommands:
 
     @classmethod
     def get_current_rig_root_joint(cls):
-
+        """
+        Gets metadata joint object
+        :return: joint - maya object
+        """
         joint = SkeletonRigToolMetadataNode.get_rig_root_joint()
         return joint
 
     @classmethod
     def load_rig_template(cls, template_name):
-
+        """
+        Creates joint chain from json file
+        :param template_name: name of list in json file
+        """
         SkeletonRigging.create_rig_base_from_json_file(joint_list_name=template_name, joint_notation="",
                                                        end_notation=True)
         return
 
     @classmethod
     def save_rig_template_from_metadata_joint_rig(cls, template_name):
+        """
+        Saves hierarchy of root rig to json file
+        :param template_name: name of template
+        """
+
         root_joint = cls.get_current_rig_root_joint()
         if root_joint:
             SkeletonRigging.save_rig_base_to_json_file(root_joint, joint_list_name=template_name)
@@ -58,6 +69,15 @@ class SkeletonRiggingCommands:
 
     @classmethod
     def mirror_rig_on_metadata_joint_rig(cls, search_text, replace_text, mirrorYZ=True, mirrorXY=True, mirrorZX=True):
+        """
+        Mirrors root rig joint hierarchy
+        :param search_text: string, criteria substring to mirror joint
+        :param replace_text: string, replaces search_text in mirrored joints
+        :param mirrorYZ: bool, mirror across YZ plane
+        :param mirrorXY: bool, mirror across XY plane
+        :param mirrorZX: bool, mirror across ZX plane
+        """
+
         root_joint = cls.get_current_rig_root_joint()
 
         if root_joint:
@@ -72,11 +92,19 @@ class SkeletonRiggingCommands:
 
     @classmethod
     def delete_rig_template(cls, template_name):
+        """
+        Deletes a template from the json file
+        :param template_name: string, name to delete
+        """
         SkeletonRigging.delete_rig_template_from_json_file(template_to_remove=template_name)
         return
 
     @classmethod
     def get_rig_template_list(cls):
+        """
+        Gets all keys from rig template json file
+        :return: rig_template_list - list of string
+        """
         rig_template_list = SkeletonRigging.get_all_rig_template_names_from_json_file()
         return rig_template_list
 class RigControlCommands:
@@ -84,9 +112,8 @@ class RigControlCommands:
     @classmethod
     def set_new_target_control(cls, new_target_control):
         """
-
-        :param new_target_control:
-        :return:
+        Sets metadata target control
+        :param new_target_control: maya object
         """
 
 
@@ -101,16 +128,18 @@ class RigControlCommands:
 
     @classmethod
     def get_current_target_control(cls):
-
+        """
+        Gets metadata target control
+        :return: control_shape - maya object
+        """
         control_shape = RigControllersMetadataNode.get_target_control_shape()
         return control_shape
 
     @classmethod
     def set_new_target_joint(cls, new_joint):
         """
-
-        :param new_joint:
-        :return:
+        Sets metadata target joint
+        :param new_joint: maya object
         """
 
         is_valid = RigControl.check_is_object_a_valid_joint(new_joint)
@@ -123,12 +152,21 @@ class RigControlCommands:
 
     @classmethod
     def get_current_target_joint(cls):
-
+        """
+        Gets current metadata target joint
+        :return: target_joint - maya object
+        """
         target_joint = RigControllersMetadataNode.get_target_joint()
         return target_joint
 
     @classmethod
     def create_control_on_target_joint(cls, joint_notation, control_notation, create_on_children):
+        """
+        Creates a control nurbs circle on metadata target joint, sets it as new target control
+        :param joint_notation: string, substring to replace in joint
+        :param control_notation: string, substring that overwrites the joint_notation
+        :param create_on_children: bool, iterate through children of root joint
+        """
         target_joint = cls.get_current_target_joint()
 
         if target_joint is None or target_joint == "":
@@ -151,6 +189,12 @@ class RigControlCommands:
 
     @classmethod
     def parent_constraint_target_control_over_target_joint(cls, constrainTranslate, constrainRotate, constrainScale):
+        """
+        Parent constraint between control and joint
+        :param constrainTranslate: bool
+        :param constrainRotate: bool
+        :param constrainScale: bool
+        """
         target_control = cls.get_current_target_control()
         target_joint = cls.get_current_target_joint()
 
@@ -172,6 +216,9 @@ class RigControlCommands:
 
     @classmethod
     def point_constraint_target_control_over_target_joint(cls):
+        """
+        Point constraint between control and joint
+        """
         target_control = cls.get_current_target_control()
         target_joint = cls.get_current_target_joint()
 
@@ -189,6 +236,9 @@ class RigControlCommands:
 
     @classmethod
     def pole_vector_constraint_target_control_over_target_joint(cls):
+        """
+        Pole vector constraint
+        """
         target_control = cls.get_current_target_control()
         target_joint = cls.get_current_target_joint()
 
@@ -206,7 +256,15 @@ class RigControlCommands:
         return
 
     @classmethod
-    def mirror_metadata_control_shapes(cls, search_text, replace_text, xMirror, yMirror, zMirror):
+    def mirror_metadata_control_shapes(cls, search_text, replace_text, XYMirror, YZMirror, ZXMirror):
+        """
+        Mirror control shape hierarchy
+        :param search_text: string, name criteria substring to mirror
+        :param replace_text: string, replacement text
+        :param XYMirror: bool, mirror across XY axis
+        :param YZMirror: bool, mirror across YZ axis
+        :param ZXMirror: bool, mirror across ZX axis
+        """
         target_control = cls.get_current_target_control()
 
         if target_control is None:
@@ -215,7 +273,7 @@ class RigControlCommands:
 
         try:
             RigControl.mirror_control_shapes(root_control_shape=target_control, search_name=search_text,
-                                             replace_name=replace_text, XYMirror=xMirror, YZMirror=yMirror, ZXMirror=zMirror)
+                                             replace_name=replace_text, XYMirror=XYMirror, YZMirror=YZMirror, ZXMirror=ZXMirror)
             OutputLog.add_to_output_log("-Mirror controls success", "")
 
         except RuntimeError as error:
@@ -229,6 +287,7 @@ class WeightPaintingCommands:
     @classmethod
     def set_weight_paint_joint(cls, new_joint):
         """
+        Set metadata weight paint joint
         :param new_joint: maya selected joint
         :return: is_success bool - set was success
         """
@@ -244,6 +303,7 @@ class WeightPaintingCommands:
     @classmethod
     def set_mesh_to_paint(cls, new_mesh):
         """
+        Set metadata mesh
         :param new_mesh: maya selected joint
         :return: is_success - set was success
         """
@@ -258,6 +318,7 @@ class WeightPaintingCommands:
     @classmethod
     def set_vertex_list_to_paint(cls, vertex_list):
         """
+        Set metadata vertex list
         :param vertex_list: maya selected joint
         :return: is_success - set was success
         """
@@ -271,6 +332,10 @@ class WeightPaintingCommands:
 
     @classmethod
     def apply_joint_weight_paint_on_metadata_mesh(cls, weight_paint_value):
+        """
+        Apply flood weight paint on mesh
+        :param weight_paint_value: float, weight paint value
+        """
         mesh = cls.get_current_weight_paint_mesh()
         joint = cls.get_current_weight_paint_joint()
 
@@ -286,6 +351,10 @@ class WeightPaintingCommands:
 
     @classmethod
     def apply_joint_weight_paint_on_metadata_vertex(cls, weight_paint_value):
+        """
+        Apply direct weight paint set value on vertex
+        :param weight_paint_value: float, weight paint value
+        """
         vertex = cls.get_current_weight_paint_vertex_list()
         joint = cls.get_current_weight_paint_joint()
 

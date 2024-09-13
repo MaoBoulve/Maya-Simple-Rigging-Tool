@@ -6,6 +6,10 @@
 # Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Main widget module
+"""
+
 from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
@@ -19,6 +23,8 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
     """
     Simple rig tool widget. Contains following nested QWidgets:
 
+    - SkeletonTabWidget
+    - RigControlTabWidget
     - WeightPaintingTabWidget
     """
 
@@ -53,6 +59,7 @@ class SimpleRigToolWindowWidget(WidgetTemplate.QtMayaWidgetWindow):
 
     def _create_ui_connections_to_class_functions(self):
         self.btn_close.clicked.connect(self._on_btn_close_clicked)
+        return
 
     def _on_btn_close_clicked(self):
         self._close_window()

@@ -6,6 +6,9 @@
 # Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Module for low level rigging system tasks. Interfaces heavily with maya and pymel functions
+"""
 
 import pymel.core as pm
 import maya.mel as mel
@@ -16,14 +19,12 @@ import rigging_json_parser
 # Edge cases handled by Maya:
 #   - Meshes cannot have separate rigs with skin binds, get a 'mesh already has skinCluster' error
 
-def TDD_test_task():
-    print("TDD_test_task")
-    # RigSetup.save_rig_base_to_json_file(pm.ls(sl=True)[0])
-
-    return
 
 def _append_to_user_output_log(new_entry):
-
+    """
+    Appends user output values to metadata node
+    :param new_entry: string
+    """
     output_system_commands.append_to_output_log(new_entry, "")
 
     return
@@ -261,7 +262,10 @@ class SkeletonRigging:
 
     @classmethod
     def check_is_object_a_valid_joint(cls, object_to_check):
-
+        """
+        Checks if maya object is a valid joint for metadata system
+        :param object_to_check: bool
+        """
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Single object not selected")
@@ -277,6 +281,10 @@ class SkeletonRigging:
 
     @classmethod
     def delete_rig_template_from_json_file(cls, template_to_remove="rig_name"):
+        """
+        Calls json parser to remove a key from json file
+        :param template_to_remove: string, name to remove
+        """
         locked_rigs = ['unity', 'unreal', 'simple']
 
         if template_to_remove in locked_rigs:
@@ -296,7 +304,10 @@ class SkeletonRigging:
 
     @classmethod
     def get_all_rig_template_names_from_json_file(cls):
-
+        """
+        Returns keys from json file of template names
+        :return: rig_names - list of string
+        """
         rig_names = rigging_json_parser.RiggingJSONDataManagement.get_all_joint_list_names()
 
         rig_names = [name for name in rig_names if '_comment' not in name]
@@ -355,7 +366,12 @@ class RigControl:
 
     @classmethod
     def create_control_shape_on_all_joints(cls, root_joint, joint_notation='_jnt', controller_notation='_ctl'):
-
+        """
+        Iterates through all joints in hierarchy to create controls
+        :param root_joint: joint maya object
+        :param joint_notation: string
+        :param controller_notation: string
+        """
         all_joints = cls._get_joint_hierarchy(root_joint)
         shape_to_return = None
 
@@ -492,7 +508,13 @@ class RigControl:
 
     @classmethod
     def _set_duplicate_group_scale_to_mirror(cls, duplicate_controls_group, x_scale, y_scale, z_scale):
-
+        """
+        Mirrors the duplicate group by setting XYZ scale
+        :param duplicate_controls_group: list of maya objects
+        :param x_scale: float
+        :param y_scale: float
+        :param z_scale: float
+        """
         mirror_group_scale = str(duplicate_controls_group[0]) + '.scale'
         pm.setAttr(mirror_group_scale, x_scale, y_scale, z_scale)
 
@@ -500,6 +522,11 @@ class RigControl:
 
     @classmethod
     def _get_controls_to_mirror_from_hierarchy(cls, root_control_shape, search_name):
+        """
+        Finds control maya objects to mirror with criteria substring
+        :param root_control_shape: root object to derive hierarchy
+        :param search_name: string, criteria substring
+        """
         hierarchy_nurbs = pm.listRelatives(root_control_shape, allDescendents=True, type='nurbsCurve')
 
         control_hierarchy = pm.listRelatives(hierarchy_nurbs, parent=True)
@@ -511,6 +538,10 @@ class RigControl:
 
     @classmethod
     def _group_and_duplicate_controls(cls, control_to_mirror):
+        """
+        Creates a maya group, duplicates group
+        :param control_to_mirror: list of maya objects
+        """
         initial_control_group = pm.group(control_to_mirror, world=True)
         pm.xform(initial_control_group, pivots=[0, 0, 0], worldSpace=True)
 
@@ -552,6 +583,13 @@ class RigControl:
 
     @classmethod
     def _rename_mirrored_controls(cls, mirrored_controls, replace_name, search_name):
+        """
+        Iterates and renames new controls with a search and replace
+        :param mirrored_controls: list of maya objects
+        :param replace_name: string
+        :param search_name: string
+        """
+
         for single_control in mirrored_controls:
             old_name = str(single_control)
             new_name = old_name.replace(search_name, replace_name)
@@ -562,7 +600,14 @@ class RigControl:
     @classmethod
     def _parent_mirrored_control_hierarchy(cls, control_parents, control_to_mirror, mirrored_controls, replace_name,
                                            search_name):
-
+        """
+        Reparents old controls and parents mirrored controls to corresponding controls in hierarchy
+        :param control_parents: list of maya objects
+        :param control_to_mirror: list of maya objects
+        :param mirrored_controls: list of maya objects
+        :param replace_name: string, criteria substring
+        :param search_name: string, new substring
+        """
         control_parent_iterations = len(control_parents)
 
         for i in range(control_parent_iterations):
@@ -589,7 +634,11 @@ class RigControl:
 
     @classmethod
     def check_is_object_a_valid_joint(cls, object_to_check):
-
+        """
+        Checks if object is valid for metadata system
+        :param object_to_check: maya object
+        :return: bool
+        """
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Single object not selected")
@@ -604,7 +653,11 @@ class RigControl:
 
     @classmethod
     def check_is_object_a_valid_nurbs_shape(cls, object_to_check):
-
+        """
+        Checks if object (or transform over object) is valid for metadata system
+        :param object_to_check: maya object
+        :return: bool
+        """
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Single object not selected")
@@ -726,7 +779,11 @@ class WeightPainting:
 
     @classmethod
     def check_is_object_a_valid_joint(cls, object_to_check):
-
+        """
+        Checks if object is valid for metadata system
+        :param object_to_check: maya object
+        :return: bool
+        """
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Single object not selected")
@@ -741,7 +798,11 @@ class WeightPainting:
 
     @classmethod
     def check_is_object_a_valid_mesh(cls, object_to_check):
-
+        """
+        Checks if object is valid for metadata system
+        :param object_to_check: maya object
+        :return: bool
+        """
         if len(object_to_check) != 1:
             # Multiple or zero objects selected
             _append_to_user_output_log("-Single object not selected")
@@ -756,7 +817,11 @@ class WeightPainting:
 
     @classmethod
     def check_is_object_valid_vertex_list(cls, user_selected_list):
-
+        """
+        Check if list of object is valid for metadata system
+        :param user_selected_list: list of maya object
+        :return: bool
+        """
         if len(user_selected_list) == 0:
             _append_to_user_output_log("-No objects were selected")
             # Zero objects selected

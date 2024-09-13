@@ -6,6 +6,10 @@
 # Simple Rigging Tool is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with Foobar. If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Tab Widget Module for skeleton tab
+"""
+
 from PySide2 import QtWidgets
 
 import qt_maya_widget_base as WidgetTemplate
@@ -44,6 +48,9 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _populate_rig_template_list(self):
+        """
+        Populates UI value from json file
+        """
         self.list_RigTemplate.clear()
 
         templates = _DataHandler.get_rig_template_list()
@@ -54,6 +61,9 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _populate_metadata_rig_root_joint(self):
+        """
+        Populates UI value from metadata
+        """
         root_joint = _DataHandler.get_metadata_rig_root_joint()
         self._update_rig_root_joint(str(root_joint))
 
@@ -86,7 +96,7 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _assign_selected_joint_as_new_rig_root_joint(self):
-        is_success, new_joint = _DataHandler.update_rig_root_joint()
+        is_success, new_joint = _DataHandler.set_rig_root_joint()
 
         if is_success:
             self._update_rig_root_joint(new_joint)
@@ -113,6 +123,9 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _load_rig_template(self):
+        """
+        Loads selected joint chain into scene
+        """
         template_to_load = self.list_RigTemplate.selectedItems()
 
         if template_to_load:
@@ -132,6 +145,9 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _save_rig_template(self):
+        """
+        Saves metadata joint hierarchy to json file using input value from user
+        """
         # get root joint hierarchy
         # read list
 
@@ -156,6 +172,9 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
     def _mirror_root_rig_hierarchy(self):
+        """
+        Mirrors metadata rig hierarchy
+        """
         search_text = self.lineEdit_MirrorRigSearch.text()
         replace_text = self.lineEdit_MirrorRigReplace.text()
         mirror_axis = self.btnGrp_jointMirrorAxis.checkedId()
@@ -171,6 +190,9 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
         return
 
     def _remove_rig_template(self):
+        """
+        Removes selected template from json file
+        """
         template_to_load = self.list_RigTemplate.selectedItems()
 
         if template_to_load:
@@ -191,12 +213,14 @@ class SkeletonTabWidget(WidgetTemplate.QtMayaNestedWidget):
 
 
 class _DataHandler:
-    """
-    
-    """
 
     @classmethod
-    def update_rig_root_joint(cls):
+    def set_rig_root_joint(cls):
+        """
+        Sets metadata value from selected maya object
+        :return: is_success - bool, new_mesh_name - string
+        """
+
         new_root_joint = QtMayaUtils.get_user_selected_maya_objects()
         is_success = SkeletonRiggingCommands.set_rig_root_joint(new_root_joint)
 
@@ -210,16 +234,30 @@ class _DataHandler:
 
     @classmethod
     def load_rig_template(cls, template_name):
+        """
+        Loads joint chain into maya from json file list
+        :param template_name: string
+        """
         SkeletonRiggingCommands.load_rig_template(template_name)
         return
 
     @classmethod
     def save_rig_template(cls, template_name):
+        """
+        Save metadata joint hierarchy to json file
+        :param template_name: string
+        """
         SkeletonRiggingCommands.save_rig_template_from_metadata_joint_rig(template_name)
         return
 
     @classmethod
     def mirror_root_rig(cls, search_text, replace_text, mirrorAxisRadioButtonID):
+        """
+        Mirrors metadata root joint hierarchy
+        :param search_text: string, criteria to mirror
+        :param replace_text: string, replaces search text
+        :param mirrorAxisRadioButtonID: int, button ID
+        """
         # -2 - YZ
         # -3 - XY
         # -4 - ZX
@@ -246,6 +284,10 @@ class _DataHandler:
 
     @classmethod
     def delete_rig_template(cls, template_name):
+        """
+        Removes input value from json file template list
+        :param template_name: string
+        """
         SkeletonRiggingCommands.delete_rig_template(template_name)
         return
 
@@ -262,6 +304,9 @@ class _DataHandler:
 
     @classmethod
     def select_current_rig_root_joint_in_maya(cls):
+        """
+        Selects metadata object
+        """
         object_to_select = SkeletonRiggingCommands.get_current_rig_root_joint()
         QtMayaUtils.select_maya_object(object_to_select)
         return

@@ -243,7 +243,10 @@ class _DataHandler:
 
     @classmethod
     def update_weight_paint_joint(cls):
-
+        """
+        Sets metadata value from selected maya object
+        :return: is_success - bool, new_joint_name - string
+        """
         new_joint = QtMayaUtils.get_user_selected_maya_objects()
         is_success = WeightPaintingCommands.set_weight_paint_joint(new_joint)
 
@@ -257,7 +260,10 @@ class _DataHandler:
 
     @classmethod
     def update_mesh_to_paint(cls):
-
+        """
+        Sets metadata value from selected maya object
+        :return: is_success - bool, new_mesh_name - string
+        """
 
         new_mesh = QtMayaUtils.get_user_selected_maya_objects()
         is_success = WeightPaintingCommands.set_mesh_to_paint(new_mesh)
@@ -272,7 +278,10 @@ class _DataHandler:
 
     @classmethod
     def update_vertex_to_paint(cls):
-
+        """
+        Sets metadata value from selected maya object
+        :return: is_success - bool, vertex_count - int
+        """
         new_vertex_list = QtMayaUtils.get_user_selected_maya_objects()
         is_success = WeightPaintingCommands.set_vertex_list_to_paint(new_vertex_list)
 
@@ -296,6 +305,9 @@ class _DataHandler:
 
     @classmethod
     def select_current_joint(cls):
+        """
+        Selects metadata value
+        """
         object_to_select = WeightPaintingCommands.get_current_weight_paint_joint()
         QtMayaUtils.select_maya_object(object_to_select)
 
@@ -303,6 +315,9 @@ class _DataHandler:
 
     @classmethod
     def select_current_mesh(cls):
+        """
+        Selects metadata value
+        """
         object_to_select = WeightPaintingCommands.get_current_weight_paint_mesh()
         QtMayaUtils.select_maya_object(object_to_select)
 
@@ -310,6 +325,9 @@ class _DataHandler:
 
     @classmethod
     def select_current_vertex(cls):
+        """
+        Selects metadata value
+        """
         object_to_select = WeightPaintingCommands.get_current_weight_paint_vertex_list()
         QtMayaUtils.select_maya_object(object_to_select)
 
@@ -317,6 +335,10 @@ class _DataHandler:
 
     @classmethod
     def check_is_mesh_paint_parameters_set(cls):
+        """
+        Checks to set buttons active
+        :return: is_valid - bool
+        """
         is_valid = True
 
         joint = WeightPaintingCommands.get_current_weight_paint_joint()
@@ -329,6 +351,10 @@ class _DataHandler:
 
     @classmethod
     def check_is_vertex_paint_parameters_set(cls):
+        """
+        Checks to set buttons active
+        :return: is_valid - bool
+        """
         is_valid = True
 
         joint = WeightPaintingCommands.get_current_weight_paint_joint()
@@ -342,6 +368,10 @@ class _DataHandler:
 
     @classmethod
     def get_current_weight_paint_settings(cls):
+        """
+        Gets current metadata values
+        :return: joint - string, mesh - string, vertex - string
+        """
         joint = str(WeightPaintingCommands.get_current_weight_paint_joint())
         mesh = str(WeightPaintingCommands.get_current_weight_paint_mesh())
 

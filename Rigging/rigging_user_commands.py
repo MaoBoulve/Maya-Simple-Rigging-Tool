@@ -10,7 +10,7 @@
 Command module for user controlling simple rigging tool
 """
 
-def open_simple_rig_tool():
+def open_tool():
     """
     Open simple rigging tool widget
     """

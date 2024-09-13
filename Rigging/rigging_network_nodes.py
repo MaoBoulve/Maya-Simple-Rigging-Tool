@@ -85,6 +85,10 @@ class SkeletonRigToolMetadataNode(DependentNode):
 
     @classmethod
     def set_rig_root_joint(cls, root_joint):
+        """
+        Sets root joint metadata value
+        :param root_joint: string
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         SkeletonRigToolMetadataNode.set(class_instance, 'rig_root_joint', root_joint)
 
@@ -92,6 +96,10 @@ class SkeletonRigToolMetadataNode(DependentNode):
 
     @classmethod
     def get_rig_root_joint(cls):
+        """
+        Gets rig root joint
+        :return: root_joint - maya object
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         root_joint = SkeletonRigToolMetadataNode.get(class_instance, 'rig_root_joint')
 
@@ -118,6 +126,10 @@ class RigControllersMetadataNode(DependentNode):
 
     @classmethod
     def set_target_control_shape(cls, control_shape):
+        """
+        Sets target control metadata value
+        :param control_shape: string
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         RigControllersMetadataNode.set(class_instance, 'target_control_shape', control_shape)
 
@@ -125,6 +137,10 @@ class RigControllersMetadataNode(DependentNode):
 
     @classmethod
     def get_target_control_shape(cls):
+        """
+        Gets target control shape
+        :return: target_control - maya object
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         target_control_shape = RigControllersMetadataNode.get(class_instance, 'target_control_shape')
 
@@ -137,6 +153,10 @@ class RigControllersMetadataNode(DependentNode):
 
     @classmethod
     def set_target_joint(cls, target_joint):
+        """
+        Sets target joint metadata value
+        :param target_joint: string
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         RigControllersMetadataNode.set(class_instance, 'target_joint', target_joint)
 
@@ -144,6 +164,10 @@ class RigControllersMetadataNode(DependentNode):
 
     @classmethod
     def get_target_joint(cls):
+        """
+        Gets target root joint
+        :return: target_joint - maya object
+                """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         target_joint = RigControllersMetadataNode.get(class_instance, 'target_joint')
 
@@ -171,6 +195,10 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def set_new_weight_paint_joint(cls, joint_name):
+        """
+        Sets joint name metadata value
+        :param joint_name: string
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         WeightPaintingMetadataNode.set(class_instance, 'joint', joint_name)
 
@@ -178,6 +206,10 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def get_weight_paint_joint(cls):
+        """
+        Gets weight paint joint
+        :return: joint_object - maya object
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         joint_name = WeightPaintingMetadataNode.get(class_instance, 'joint')
 
@@ -191,6 +223,10 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def set_new_mesh(cls, mesh_name):
+        """
+        Sets mesh name metadata value
+        :param mesh_name: string
+                """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         WeightPaintingMetadataNode.set(class_instance, 'mesh', mesh_name)
 
@@ -198,6 +234,10 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def get_mesh(cls):
+        """
+        Gets mesh metadata value
+        :return: mesh_object - maya object
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
         mesh_name = WeightPaintingMetadataNode.get(class_instance, 'mesh')
 
@@ -211,6 +251,10 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def set_new_vertex_list(cls, vertex_list):
+        """
+        Sets vertex list metadata value
+        :param vertex_list: list of string
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
 
         vertex_list = [str(x) for x in vertex_list]
@@ -223,6 +267,10 @@ class WeightPaintingMetadataNode(DependentNode):
 
     @classmethod
     def get_vertex_list(cls):
+        """
+        Gets vertex list metadata value
+        :return: vertex_list - list of maya objects
+        """
         class_instance = cls.get_metadata_class_instance_from_maya_node()
 
         long_string = WeightPaintingMetadataNode.get(class_instance, 'vertex')
@@ -251,12 +299,20 @@ class OutputLog(DependentNode):
 
     @staticmethod
     def __parse_string_to_list(single_string):
+        """
+        Converts an attribute string to readable python list
+        :param single_string: attribute string, uses ` as separator value
+        :return: string_list - list of string
+        """
         string_list = single_string.split('`')
 
         return string_list
 
     @classmethod
     def clear_output_log(cls):
+        """
+        Clear output log values
+        """
         output_maya_node = OutputLog.__get_output_maya_node()
         output_node = OutputLog(node=output_maya_node)
 
@@ -267,6 +323,11 @@ class OutputLog(DependentNode):
 
     @classmethod
     def add_to_output_log(cls, log_entry, target_object_name):
+        """
+        Adds a value to output log
+        :param log_entry: string
+        :param target_object_name: string, maya object name
+        """
         output_maya_node = OutputLog.__get_output_maya_node()
         output_node = OutputLog(node=output_maya_node)
 
@@ -286,6 +347,12 @@ class OutputLog(DependentNode):
 
     @staticmethod
     def __append_to_output_node_attribute_strings(output_node, new_string, attribute='output_log'):
+        """
+        Appends to output attribute to keep a persistent value
+        :param output_node: maya node
+        :param new_string: string
+        :param attribute: string, name of attribute
+        """
         current_string = OutputLog.get(output_node, attribute)
 
         if current_string == '':
@@ -300,7 +367,6 @@ class OutputLog(DependentNode):
     @classmethod
     def get_output_log(cls):
         """
-
         :return: Returns 2 lists of following outputs
 
         [output_log]
