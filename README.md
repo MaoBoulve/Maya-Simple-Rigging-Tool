@@ -1,30 +1,25 @@
-This tool is a generic game asset validator for Maya. It allows a user to tag assets as part of Prop, Animation, and Character groups and validate for common asset requirements (detailed below).
+This tool is a simple rigging helper tool for Maya. It automates common rigging and control setup tasks.
 
 Metadata modules provided courtesy of Micah Zahm
 
-**Character Validation Checks**
-  - Character Mesh only using valid list of materials
-  - Character Mesh Hierarchy only consists of mesh shape objects
-  - Character Mesh rigged with skin binding influence only coming from tagged rig joints
-  - Rig Hierarchy consists of only joint objects
-  - Rig Hierarchy consists of no keyed frames in specified timeframe
+**Skeleton Joint Setup**
+  - Save & Load Rig Templates from a JSON file
+  - Mirror rig across XY/YZ/ZX planes
 
-**Animation Validation Checks**
-  - Rig Hierarchy consists of only joint objects
-  - Rig keyed for specified transform attributes, no floating point keys, in specified timeframe
+**Rig Control Setup**
+  - Create and auto-rename controls on top of joints
+  - Constrain controls on joints
+  - Mirror control hierarchy across XY/YZ/ZX planes
 
-**Prop Validation Checks**
-  - Mesh only using valid list of materials
-  - Mesh Hierarchy only consists of mesh shape objects
-  - Mesh Node connections to prop has no rig influence
-  - Mesh has no keyed attributes in specified timeframe
-  - Collision Meshes are present, searching with user defined prefix
+**Weight Painting Tasks**
+  - Flood mesh with weight paint from a joint
+  - Flood vertex with weight paint value from a joint
 
 Following code block should be copied into the Maya script editor and run.
 
 '''
     
-    # Place Metadata, QInterface, and Validator folders into .../Documents/maya/scripts/ folder
+    # Place Metadata, QInterface, and Rigging folders into .../Documents/maya/scripts/ folder
     # Edit filepaths then copy the following code into a Maya Python script and run.
     # To add the code as a shelf button: Hit Ctrl + A, then Middle Click-dragging the code up to shelf
     
@@ -40,7 +35,9 @@ Following code block should be copied into the Maya script editor and run.
     import rigging_user_commands
     
     # Main tool
-    rigging_user_commands.open_simple_rig_tool()
+    rigging_user_commands.open_tool()
+
+    
 
 
 '''
