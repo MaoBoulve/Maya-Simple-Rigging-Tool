@@ -25,7 +25,8 @@ Metadata modules provided courtesy of Micah Zahm
 
 2. Edit filepath, then paste following code block into a **Python** script editor
 
-    
+'''    
+
     # Place Metadata, QInterface, and Rigging folders into C:\Users\[user]\Documents\maya\scripts\Maya-Simple-Rigging-Tool
     # Edit filepaths then copy the following code into a Maya Python script and run.
     
@@ -45,6 +46,7 @@ Metadata modules provided courtesy of Micah Zahm
     # Main tool
     rigging_user_commands.open_tool()
 
+'''
     
 ![img_3.png](img_3.png)
 
