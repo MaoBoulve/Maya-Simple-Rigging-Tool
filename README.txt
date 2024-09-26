@@ -1,6 +1,6 @@
 # Copy and paste this whole text into Maya's python script editor
 
-# Place Metadata, QInterface, and Rigging folders into C:\Users\[user]\Documents\maya\scripts\Maya-Simple-Rigging-Tool
+# Place Maya-Simple-Rigging-Tool folders into C:\Users\[user]\Documents\maya\scripts\
 # Edit filepaths then copy the following code into a Maya Python script and run.
 
 # To add the code as a shelf button:

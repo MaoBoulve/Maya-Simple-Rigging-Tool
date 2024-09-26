@@ -19,19 +19,19 @@ Metadata modules provided courtesy of Micah Zahm
 
 # Setup
 
-1. Open Maya script editor
+1. Place 'Maya-Simple-Rigging-Tool' folder into Maya scripts directory.
+
+Default Maya script directory is at **C:\Users\\[Username]\Documents\maya\scripts**
+
+![img_1.png](img_1.png)
+
+2. Open Maya script editor
 
 ![img.png](img.png)
 
-2. Edit filepath, then paste following code block into a **Python** script editor
+3. Edit filepath in following code block, then paste into a **Python** script editor
 
 '''    
-
-    # Place Metadata, QInterface, and Rigging folders into C:\Users\[user]\Documents\maya\scripts\Maya-Simple-Rigging-Tool
-    # Edit filepaths then copy the following code into a Maya Python script and run.
-    
-    # To add the code as a shelf button: 
-    # Select all script text, then Middle-click drag the code up to shelf
 
     import sys
 
@@ -50,6 +50,6 @@ Metadata modules provided courtesy of Micah Zahm
     
 ![img_3.png](img_3.png)
 
-3. Create a Toolbar Button for ease of use by middle-click dragging script text
+4. Create a Toolbar Button for ease of use by middle-click dragging script text
 
 ![img_2.png](img_2.png)
