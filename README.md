@@ -1,3 +1,5 @@
+
+# Overview
 This tool is a simple rigging helper tool for Maya. It automates common rigging and control setup tasks.
 
 Metadata modules provided courtesy of Micah Zahm
@@ -15,15 +17,21 @@ Metadata modules provided courtesy of Micah Zahm
   - Flood mesh with weight paint from a joint
   - Flood vertex with weight paint value from a joint
 
-Following code block should be copied into the Maya script editor and run.
+# Setup
 
-'''
+1. Open Maya script editor
+
+![img.png](img.png)
+
+2. Edit filepath, then paste following code block into a **Python** script editor
+
     
-    # Place Metadata, QInterface, and Rigging folders into .../Documents/maya/scripts/ folder
+    # Place Metadata, QInterface, and Rigging folders into C:\Users\[user]\Documents\maya\scripts\Maya-Simple-Rigging-Tool
     # Edit filepaths then copy the following code into a Maya Python script and run.
-    # To add the code as a shelf button: Hit Ctrl + A, then Middle Click-dragging the code up to shelf
     
-    
+    # To add the code as a shelf button: 
+    # Select all script text, then Middle-click drag the code up to shelf
+
     import sys
 
     # rename [User directory name] to user account Maya files is installed under
@@ -38,6 +46,8 @@ Following code block should be copied into the Maya script editor and run.
     rigging_user_commands.open_tool()
 
     
+![img_3.png](img_3.png)
 
+3. Create a Toolbar Button for ease of use by middle-click dragging script text
 
-'''
+![img_2.png](img_2.png)
